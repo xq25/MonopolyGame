@@ -19,8 +19,16 @@ function initializeHomePage() {
 document.addEventListener("DOMContentLoaded", () => {
     initializeHomePage();
     changeSidebar();
-    playButton.addEventListener("click", () => loadContent(mainContainer, "/src/pages/selectPlayers.html"));
+    playButton.addEventListener("click", () => {
+        loadContent(mainContainer, "/src/pages/selectPlayers.html").then(() => {
+            // Carga manual del script después de que el contenido se haya cargado, Para asi poder encontrar los elementos que se ejecutan en el script
+            const script = document.createElement('script');
+            // Asignamos la ruta del script
+            script.src = "/src/components/selectPlayers.js";
+            // Añadimos el script al body para que se ejecute, por defecto se añade al final del body
+            document.body.appendChild(script);
+        });
+    });
 
 }); 
 
-// Espera a que el DOM esté completamente cargado antes de inicializar la página y configurar la barra lateral
