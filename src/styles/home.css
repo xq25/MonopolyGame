@@ -1,0 +1,68 @@
+/* Botón */
+#toggleSidebar {
+  position: fixed;
+  top: 1px;
+  left: 0;
+  z-index: 1000;
+  width: 10%;
+  height: 50px;
+  background-color: #024083f0;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+/* Sidebar */
+#SideBar {
+  position: fixed;
+  top: 40px;
+  left: -100%; /* Oculto por defecto en móviles */
+  width: 25%;
+  height: 100%;
+  background-color: #064485f0;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+  transition: left 0.3s ease;
+  z-index: 999;
+  padding: 20px;
+  border: 2px solid #012750f0;
+}
+
+/* Cuando está abierto */
+#SideBar.open {
+  left: 0;
+}
+/* Contenido */
+#mainContent {
+  transition: margin-left 0.3s ease;
+  padding: 20px;
+  margin-top: 1%;
+  margin-left: 1%;
+}
+.buttons-sidebar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 10px;
+  
+}
+#playButton {
+  position: absolute;
+  bottom: 40px;
+}
+
+/* Pantallas grandes */
+@media (min-width: 992px) {
+  #toggleSidebar {
+    width: 25%;
+  }
+  #SideBar {
+    left: 0; /* siempre visible */
+  }
+  #mainContent {
+    margin-left: 25%;
+    width: 75%;
+  }
+}
+

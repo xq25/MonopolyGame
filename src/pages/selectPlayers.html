@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Players</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="/src/styles/selectPlayers.css">
+    <link rel="stylesheet" href="/src/styles/formUser.css">
+</head>
+<body>
+    <!-- Este div es el que va a contener todos los recuadros donde van a ir los formularios de los jugadores  -->
+    <div class="forms-container">
+        <div id="form-red" class="form">
+            <!-- El formulario rojo por defecto va a cargar el formulario para agregar los datos del usuario -->
+        </div>
+        <div id="form-blue" class="form">
+            <!-- El formulario azul por defecto va a cargar el formulario para agregar los datos del usuario -->
+        </div>
+        <div id="form-green" class="form"></div>
+        <div id="form-yellow" class="form"></div>
+    </div>
+    <div>
+        <p id="add-player-text">Seleccione "+" para agregar un nuevo jugador</p>
+    </div>
+    <script src="/src/components/selectPlayers.js"></script>
+</body>
+</html>

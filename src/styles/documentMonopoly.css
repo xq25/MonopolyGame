@@ -1,0 +1,87 @@
+/* Estilo general */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f8f9fa;
+  color: #333;
+  margin: 0;
+  padding: 2rem;
+  line-height: 1.6;
+}
+
+/* Contenedor principal */
+.monopoly-description {
+  margin: auto;
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  background: #f9f9f9;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* Encabezado */
+.monopoly-description header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.monopoly-description h1 {
+  font-size: 2.5rem;
+  color: #e63946; /* rojo Monopoly */
+  margin-bottom: 0.5rem;
+}
+
+.monopoly-description .subtitle {
+  font-size: 1.2rem;
+  color: #555;
+}
+
+/* Secciones */
+.monopoly-description h2 {
+  margin-top: 1.5rem;
+  font-size: 1.5rem;
+  color: #1d3557;
+  border-bottom: 2px solid #457b9d;
+  padding-bottom: 0.3rem;
+}
+
+.monopoly-description p {
+  margin: 0.8rem 0;
+}
+
+/* Listas */
+.monopoly-description ul {
+  list-style: none;
+  padding: 0;
+}
+
+.monopoly-description ul li {
+  background: #f1f1f1;
+  margin: 0.4rem 0;
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
+  transition: background 0.3s ease;
+}
+
+.monopoly-description ul li:hover {
+  background: #e6e6e6;
+}
+
+/* Lista numerada */
+.monopoly-description ol {
+  padding-left: 1.2rem;
+}
+
+.monopoly-description ol li {
+  margin: 0.6rem 0;
+}
+
+/* Footer */
+.monopoly-description footer {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #777;
+}

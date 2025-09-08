@@ -1,0 +1,35 @@
+.rules-container {
+      background: #f9f9f9;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .rules-container h1 {
+      color: #024083;
+      margin-bottom: 20px;
+    }
+    .rules-container h2 {
+      margin-top: 25px;
+      color: #064485;
+    }
+    .rules-container ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    .rules-container ul li {
+      margin-bottom: 10px;
+      padding-left: 25px;
+      position: relative;
+    }
+    .rules-container ul li::before {
+      content: "🎲";
+      position: absolute;
+      left: 0;
+    }
+    .highlight {
+      background: #ffebc2;
+      padding: 10px;
+      border-left: 5px solid #f39c12;
+      border-radius: 8px;
+      margin: 15px 0;
+    }

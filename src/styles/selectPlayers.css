@@ -1,0 +1,58 @@
+.forms-container {
+    display: grid; /* usamos grid en vez de flex */
+    grid-template-columns: repeat(2, 1fr); /* 2 columnas iguales */
+    justify-items: center; /* centra los formularios horizontalmente */
+    gap: 8px; /* espacio entre los formularios */
+    padding: 8px;
+    width: 100%; 
+    height: 500px; 
+}
+.form{
+    padding: 10px;
+}
+#form-red{
+    background-color: #ff9d9d;
+    border: 1px solid #ff5c5c;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+    height: auto;
+    margin: 5px 5px 5px 5px;
+}
+#form-blue{
+    background-color: #9dcaff;
+    border: 1px solid #5c9eff;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+    margin: 5px 5px 5px 5px;
+}
+#form-green{
+    background-color: #9dff9d;
+    border: 1px solid #5ce65c;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+    margin: 5px 5px 5px 5px;
+}
+#form-yellow{
+    background-color: #ffff9d;
+    border: 1px solid #e5e65c;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+    margin: 5px 5px 5px 5px;
+}
+#add-player-text{
+    width: 100%;
+    height: 30px;
+    padding: 5px;
+    font-size: 16px;
+    text-align: center;
+}
+@media (min-width: 992px) {
+    .forms-container {
+        grid-template-columns: repeat(4, 1fr); /* 4 columnas iguales en pantallas grandes */
+    }
+    
+}
