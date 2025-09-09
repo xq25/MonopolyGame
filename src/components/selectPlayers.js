@@ -17,12 +17,28 @@ Sin el IIFE, podrías tener problemas si el script se carga antes de que el HTML
     const formGreen = document.getElementById('form-green');
     const formYellow = document.getElementById('form-yellow');
 
+    function loadCountries(elementSelector){
+        fetch('http://127.0.0.1:5000/countries')  //Llamamos a nuestro endpoint que manda mediante un get la lista de paises
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(country => {
+                    const option = document.createElement('option');
+                    option.value = Object.keys(country)[0]; // Usamos el código del país como valor, Que en este caso es la key de cada json
+                    option.textContent = Object.values(country)[0]; // Mostramos el nombre del país
+                    elementSelector.appendChild(option);
+                });
+            });
+    }
     // Función para cargar el formulario de un jugador en el div correspondiente
     function loadForm(elementForm) {
         fetch('/src/pages/formUser.html')
             .then(response => response.text())
             .then(html => {
-                elementForm.innerHTML = html;
+                elementForm.innerHTML = html; // Insertamos el HTML del formulario en el div correspondiente (formRed, formBlue, etc.)
+                const countrySelect = elementForm.querySelector('.countries-selector'); // Seleccionamos el select del formulario insertado que deberia de existir al momento de cargarlo.
+                if (countrySelect) { //Protegemos con un if por si no se encuentra el select, para evitar errores
+                    loadCountries(countrySelect); // Cargamos los países en el select del formulario insertado
+                }
             });
     }
     // Carga los formularios de los jugadores rojo y azul (*por defecto siempre estan cargados)

@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // Añadimos el script al body para que se ejecute, por defecto se añade al final del body
             document.body.appendChild(script);
         });
+        
     });
 
 }); 
