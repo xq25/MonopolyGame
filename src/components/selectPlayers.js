@@ -12,13 +12,14 @@ Sin el IIFE, podrías tener problemas si el script se carga antes de que el HTML
 
 (function() { // <----- esto es el IIFE, Funcion que se ejecuta inmediatamente despues de ser definida
     // Seleccion de los formularios de los jugadores por su ID
-    const countries = fetch('http://127.0.0.1:5000/countries').then(response => response.json())
     const formRed = document.getElementById('form-red');
     const formBlue = document.getElementById('form-blue');
     const formGreen = document.getElementById('form-green');
     const formYellow = document.getElementById('form-yellow');
+    //Seleccion de los iconos "+" para cargar los formularios de el jugador amarillo y verde.
     const iconYellow = document.getElementById('addPlayer-yellow');
     const iconGreen = document.getElementById('addPlayer-green');
+    const readyBtn = document.getElementById('readyToPlay');
 
     function loadCountries(elementSelector){ //Cambiar la logica para que no este cargando constantemnete los paises, que solo lo cargue una vez y lo reutilice
         fetch('http://127.0.0.1:5000/countries')  //Llamamos a nuestro endpoint que manda mediante un get la lista de paises
@@ -77,21 +78,46 @@ Sin el IIFE, podrías tener problemas si el script se carga antes de que el HTML
             });
         }
     }
+    function getPlayerData(formElement) {
+        // Busca el formulario dentro del div
+        let response = null
+        const userForm = formElement.querySelector('form');
+        if (userForm){
+            // Extrae los valores de los campos (ajusta los nombres según tu formUser.html)
+            const name = userForm.querySelector('input')?.value || '';
+            const country = userForm.querySelector('.countries-selector')?.value || '';
+            response = { 
+                color: formElement.id.replace('form-', ''), // Ej: 'red', 'blue'
+                name,
+                country
+            };
+        } // Si no hay formulario, no hace nada
+        return response
+    }
+
     // Carga los formularios de los jugadores rojo y azul (*por defecto siempre estan cargados)
     function basicLoadForm(){
         loadForm(formRed);
         loadForm(formBlue);
     }
 
-    basicLoadForm(); //Cargamos los formularios de los jugadores rojo y azul por defecto
-
-    //‼️‼️‼️‼️‼️Modificar esta logica para que se pueda cargar y descargar el formulario 
+    basicLoadForm(); //Cargamos los formularios de los jugadores rojo y azul (por defecto)
     iconGreen.addEventListener('click', () => {
-        //Si el contador es menor que 1, carga el formulario y aumenta el contador para que no se pueda volver a cargar despues de los clicks que se hagan sobre los campos del formulario
         loadForm(formGreen);
     });
     iconYellow.addEventListener('click', () => {
-        //Si el contador es menor que 1, carga el formulario y aumenta el contador para que no se pueda volver a cargar despues de los clicks que se hagan sobre los campos del formulario
         loadForm(formYellow);
+    });
+    readyBtn.addEventListener('click', () => {
+        const infoPlayers = []
+        const formularios = [formRed, formBlue, formYellow, formGreen]
+        formularios.forEach(formElement => {
+            const formData = getPlayerData(formElement);
+            if (formData){
+                infoPlayers.push(formData)
+
+            }
+            console.log(formData)
+        });
     });
 })();
