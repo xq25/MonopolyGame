@@ -1,3 +1,6 @@
+.closeButtonDiv{
+    height: 10px;
+}
 .nickName {
     margin-bottom: 10px;
 }
@@ -19,10 +22,25 @@
   font-size: 14px;
   padding: 5px;
 }
+/* Botón X */
+.close-btn {
+  position: relative;
+  margin-left: 90%;
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  font-weight: bold;
+  color: #444;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+.close-btn:hover {
+  color: red;
+}
 @media (min-width: 992px) {
     .money{
         position: relative;
-        top: 250px;
+        top: 220px;
     }
     .nickName {
         margin-bottom: 20px;

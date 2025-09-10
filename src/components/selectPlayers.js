@@ -12,12 +12,15 @@ Sin el IIFE, podrías tener problemas si el script se carga antes de que el HTML
 
 (function() { // <----- esto es el IIFE, Funcion que se ejecuta inmediatamente despues de ser definida
     // Seleccion de los formularios de los jugadores por su ID
+    const countries = fetch('http://127.0.0.1:5000/countries').then(response => response.json())
     const formRed = document.getElementById('form-red');
     const formBlue = document.getElementById('form-blue');
     const formGreen = document.getElementById('form-green');
     const formYellow = document.getElementById('form-yellow');
+    const iconYellow = document.getElementById('addPlayer-yellow');
+    const iconGreen = document.getElementById('addPlayer-green');
 
-    function loadCountries(elementSelector){
+    function loadCountries(elementSelector){ //Cambiar la logica para que no este cargando constantemnete los paises, que solo lo cargue una vez y lo reutilice
         fetch('http://127.0.0.1:5000/countries')  //Llamamos a nuestro endpoint que manda mediante un get la lista de paises
             .then(response => response.json())
             .then(data => {
@@ -36,10 +39,43 @@ Sin el IIFE, podrías tener problemas si el script se carga antes de que el HTML
             .then(html => {
                 elementForm.innerHTML = html; // Insertamos el HTML del formulario en el div correspondiente (formRed, formBlue, etc.)
                 const countrySelect = elementForm.querySelector('.countries-selector'); // Seleccionamos el select del formulario insertado que deberia de existir al momento de cargarlo.
+                const closeBtn = elementForm.querySelector('.close-btn')
+
                 if (countrySelect) { //Protegemos con un if por si no se encuentra el select, para evitar errores
                     loadCountries(countrySelect); // Cargamos los países en el select del formulario insertado
                 }
+                //Para los formularios (form-red y form-blue) No se puede mostrar la opcion de cerrar el formulario. Por defecto siempre deben estar cargados
+                if (elementForm.id === 'form-red' || elementForm.id === 'form-blue'){
+                    closeBtn.style.display = 'none'
+                }
+                else{
+                    closeBtn.addEventListener('click', () => {
+                        closeForm(elementForm)
+                        
+                    });
+                } 
             });
+    }
+    function closeForm(elementForm){
+        let inyeccion = ``
+        if (elementForm.id === 'form-yellow'){
+            inyeccion = `<div class="addIcon" id="addPlayer-yellow">+</div>`
+        }
+        else{
+            inyeccion = `<div class="addIcon" id="addPlayer-green">+</div>`
+        }
+        elementForm.innerHTML = inyeccion
+        // Vuelve a agregar el event listener al nuevo botón
+        const newIcon = elementForm.querySelector('.addIcon');
+        if (elementForm.id === 'form-yellow') {
+            newIcon.addEventListener('click', () => {
+                loadForm(elementForm);
+            });
+        }else {
+            newIcon.addEventListener('click', () => {
+                loadForm(elementForm);
+            });
+        }
     }
     // Carga los formularios de los jugadores rojo y azul (*por defecto siempre estan cargados)
     function basicLoadForm(){
@@ -47,23 +83,15 @@ Sin el IIFE, podrías tener problemas si el script se carga antes de que el HTML
         loadForm(formBlue);
     }
 
-    // Ejecuta directamente, ya que el HTML ya está en el DOM
     basicLoadForm(); //Cargamos los formularios de los jugadores rojo y azul por defecto
 
-    let countGreen = 0;
-    let countYellow = 0;
-    formGreen.addEventListener('click', () => {
+    //‼️‼️‼️‼️‼️Modificar esta logica para que se pueda cargar y descargar el formulario 
+    iconGreen.addEventListener('click', () => {
         //Si el contador es menor que 1, carga el formulario y aumenta el contador para que no se pueda volver a cargar despues de los clicks que se hagan sobre los campos del formulario
-        if (countGreen < 1) {
-            loadForm(formGreen);
-            countGreen++;
-        }
+        loadForm(formGreen);
     });
-    formYellow.addEventListener('click', () => {
+    iconYellow.addEventListener('click', () => {
         //Si el contador es menor que 1, carga el formulario y aumenta el contador para que no se pueda volver a cargar despues de los clicks que se hagan sobre los campos del formulario
-        if (countYellow < 1) {
-            loadForm(formYellow);
-            countYellow++;
-        }
+        loadForm(formYellow);
     });
 })();
