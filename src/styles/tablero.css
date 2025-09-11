@@ -1,0 +1,92 @@
+/* ---- ESTILOS BASE ---- */
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  height: 100vh;        /* ocupar toda la ventana */
+  overflow: hidden;
+}
+
+/* ---- TABLERO ---- */
+.board {
+  height: 95vmin;       /* cuadrado, siempre según el lado menor */
+  width: 95vmin;
+  display: grid;
+  grid-template-rows: repeat(11, 1fr);     /* 11 filas iguales */
+  grid-template-columns: repeat(11, 1fr);  /* 11 columnas iguales */
+  gap: 2px;
+  background: #333;
+  box-sizing: border-box;
+  padding: 5px;
+  box-shadow: 2px solid #333;
+}
+
+/* ---- CASILLAS ---- */
+.square {
+  background: white;
+  border: 1px solid #999;
+  font-size: 9px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.color-bar {
+  height: 10px;
+  width: 100%;
+}
+
+/* ---- CENTRO ---- */
+#center {
+  grid-row: 2 / 11;      /* ocupa filas 2 a 10 */
+  grid-column: 2 / 11;   /* ocupa columnas 2 a 10 */
+  display: grid;
+  grid-template-rows: 1fr 2fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
+  background: #f5f5f5;   /* mismo color que el fondo */
+  align-items: center;
+  justify-items: center;
+}
+
+/* ---- CARTAS ---- */
+.carta {
+  width: 100px;
+  height: 150px;
+  border: 2px solid #333;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold; 
+  border-radius: 20px;
+  margin: 10px ;
+}
+
+/* Posiciones estilo Monopoly */
+#cajaComunidad {
+  grid-row: 1;
+  grid-column: 2;   /* arriba al centro */
+  background-color: lightblue;
+
+}
+
+#cajaSuerte {
+  grid-row: 3;
+  grid-column: 2;   /* abajo al centro */
+  background-color: lightgreen;
+}
+
+/* ---- LOGO ---- */
+#logo {
+  grid-row: 2;
+  grid-column: 2;   /* centro exacto */
+  width: 250px;
+  height: 150px;
+  background: url("/assets/images/logo.png ") no-repeat center/contain;
+}
+
+
