@@ -37,6 +37,10 @@
 .close-btn:hover {
   color: red;
 }
+.input-error {
+  border: 2px solid red;
+  background-color: #ffe6e6;
+}
 @media (min-width: 992px) {
     .money{
         position: relative;

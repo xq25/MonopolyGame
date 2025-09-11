@@ -6,8 +6,6 @@ const rulesButton = document.getElementById("rulesButton"); // boton rules del H
 const playButton = document.getElementById("playButton"); // boton play del Home
 const content = document.getElementById("content"); // el div donde se quiere cargar el contenido
 
-
-
 // Cargar el contenido inicial (por defecto cargamos la introduccion del juego)
 function initializeHomePage() {
     loadContent(content); // Carga la introducción del juego por defecto
@@ -28,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // Añadimos el script al body para que se ejecute, por defecto se añade al final del body
             document.body.appendChild(script);
         });
-        
+
     });
 
 }); 
