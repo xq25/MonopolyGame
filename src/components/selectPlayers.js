@@ -153,7 +153,8 @@ Sin el IIFE, podrías tener problemas si el script se carga antes de que el HTML
         });
         if(infoPlayers.length === activeForms){
             //Aqui va la funcion de mandar la informacion de todos los players
-            console.log(infoPlayers)
+            // window.location.href = '/src/pages/tablero.html'; Comentar a felipe ‼️‼️‼️
+            document.dispatchEvent(new CustomEvent('playersReady', { detail: infoPlayers }));
         }
     });
 })();

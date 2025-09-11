@@ -25,6 +25,15 @@ document.addEventListener("DOMContentLoaded", () => {
             script.src = "/src/components/selectPlayers.js";
             // Añadimos el script al body para que se ejecute, por defecto se añade al final del body
             document.body.appendChild(script);
+            // Escuchar el evento personalizado
+            document.addEventListener('playersReady', (e) => {
+                const infoPlayers = e.detail; // Aquí tienes la info validada
+                // Puedes guardar infoPlayers en localStorage, sessionStorage, o pasarlo a tu backend si lo necesitas
+                // Cargar la página del tablero
+                loadContent(mainContainer, "/src/pages/tablero.html");
+                // Si necesitas pasar infoPlayers al tablero, puedes hacerlo aquí
+                // Por ejemplo: localStorage.setItem('players', JSON.stringify(infoPlayers));
+            }, { once: true }); // Solo una vez por carga
         });
 
     });
