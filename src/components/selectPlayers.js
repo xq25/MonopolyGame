@@ -20,7 +20,7 @@ Sin el IIFE, podrías tener problemas si el script se carga antes de que el HTML
     const iconYellow = document.getElementById('addPlayer-yellow');
     const iconGreen = document.getElementById('addPlayer-green');
     const readyBtn = document.getElementById('readyToPlay');
-    let activeForms = 0
+    let activeForms = 0 //Cada que carguemos un nuevo formulario aumentamos su numero y cada que se cierre lo disminuimos para poder validar que todos los formularios esten bien diligenciados para empezar el juego.
 
     function loadCountries(elementSelector){ //Cambiar la logica para que no este cargando constantemnete los paises, que solo lo cargue una vez y lo reutilice
         fetch('http://127.0.0.1:5000/countries')  //Llamamos a nuestro endpoint que manda mediante un get la lista de paises
@@ -42,7 +42,7 @@ Sin el IIFE, podrías tener problemas si el script se carga antes de que el HTML
                 elementForm.innerHTML = html; // Insertamos el HTML del formulario en el div correspondiente (formRed, formBlue, etc.)
                 const countrySelect = elementForm.querySelector('.countries-selector'); // Seleccionamos el select del formulario insertado que deberia de existir al momento de cargarlo.
                 const closeBtn = elementForm.querySelector('.close-btn')
-                activeForms ++
+                activeForms ++ //Cada vez que se cargue un formulario aumentamos la variable.
 
                 if (countrySelect) { //Protegemos con un if por si no se encuentra el select, para evitar errores
                     loadCountries(countrySelect); // Cargamos los países en el select del formulario insertado
@@ -63,7 +63,7 @@ Sin el IIFE, podrías tener problemas si el script se carga antes de que el HTML
     }
     function closeForm(elementForm){
         let inyeccion = ``
-        activeForms --
+        activeForms -- //Cada que se active la funcion para cerrar un formulario disminuimos la variable.
         //Debemo evaluar cual formulario estamso cerrando, para asi crear nuevamente su icono de agregacion correspondiente
         if (elementForm.id === 'form-yellow'){
             inyeccion = `<div class="addIcon" id="addPlayer-yellow">+</div>` //Icono "+" de agregacion respectivo para el formulario del jugador amarillo.
@@ -103,28 +103,44 @@ Sin el IIFE, podrías tener problemas si el script se carga antes de que el HTML
             };
 
         } 
-        return playerDataRestriccions(response)?response: null;
+        return playerDataRestriccions(response, formElement)?response: null; //Si la informacion es valida la rescatamos en un Objeto.
     }
-    function playerDataRestriccions(data){
+    //Funcion para salvar la informacion valida de cada formulario
+    function playerDataRestriccions(data, formElement){
         
-        let nameValidation = false;
-        let countryValidation = false;
-        
+        let nameValidation = true;
+        let countryValidation = true;
+
+        //Validamos que el formulario este activo
         if (data !== null){
-            if (data.nickName  !== '' ){
-                nameValidation = true;
+            //Extraemos el div que esta destinado para mostrar el error que implica no seleccionar o no rellenar un campo
+            const errorDivSelect = formElement.querySelector('.error-select');
+            const errorDivInput = formElement.querySelector('.error-input');
+
+            //Limpiamos el div para mostrar el error. Ya que esto nos permite que si la informacion se corrige, se deje de mostrar el error
+            errorDivInput.textContent = '';
+            errorDivSelect.textContent = '';
+            if (data.nickName  === '' ){
+                //Si no se ingresa un nickName
+                const inputCamp = formElement.querySelector('input');
+                
+                if (inputCamp) {
+                    errorDivInput.textContent = 'Ingresa un nickname!!'; //Mostramos el error en el campo correspondiente
+                }
+                nameValidation = false;
             }
-            else{
-                alert(`Formulario ${data.color}: Debes ingresar un nickname`);
+            if (data.country === ''){
+                //Si no se selecciona un pais
+                const selectCamp = formElement.querySelector('.countries-selector');
+                if (selectCamp) {
+                    errorDivSelect.textContent = 'Elige un país!!';//Mostramos el error en el campo correspondiente
+                }
+                countryValidation = false;
             }
-            if (data.country !== ''){
-                countryValidation = true;
-            }
-            else{
-                alert(`Formulario ${data.color}: Debes seleccionar al menos un país`);
-            }
+            
+
         }
-        return (nameValidation && countryValidation)
+        return (nameValidation && countryValidation) //Solo si todos los campos estan diligenciados se devuelve true.
         
     }
     // Carga los formularios de los jugadores rojo y azul (*por defecto siempre estan cargados)
@@ -144,17 +160,20 @@ Sin el IIFE, podrías tener problemas si el script se carga antes de que el HTML
         const infoPlayers = [] //En esta constante se va a guardar toda la informacion de los usuarios que tengan toda su informacion valida para jugar
         const formularios = [formRed, formBlue, formYellow, formGreen]
         formularios.forEach(formElement => {
-        
+            //Por cada formulario debemos validar si tiene informacion (activo o inactivo).
             const formData = getPlayerData(formElement);
             if (formData !== null){
+                //Si hay contenido valido y completo en el formulario lo guardamos en nuestra constante
                 infoPlayers.push(formData)
             }
             
         });
-        if(infoPlayers.length === activeForms){
-            //Aqui va la funcion de mandar la informacion de todos los players
-            // window.location.href = '/src/pages/tablero.html'; Comentar a felipe ‼️‼️‼️
+        if(infoPlayers.length === activeForms){ //Validamos que todos los formularios activos esten bien diligenciados para empezar el juego.
+            //Creamos e invocamos un customEvent que va a ser escuchado desde nuestro index, en el cual pasaremos la informacion de los usuarios para empezar a trabajarla desde alli.
             document.dispatchEvent(new CustomEvent('playersReady', { detail: infoPlayers }));
         }
+        // else{
+        //     alert('Verifica que todos los formularios esten diligenciados')
+        // }
     });
 })();

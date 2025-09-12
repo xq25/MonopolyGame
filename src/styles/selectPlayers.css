@@ -72,6 +72,11 @@
     height: auto;
 
 }
+.error{
+    color: red;
+    font-size: 0.9em;
+
+}
 @media (min-width: 992px) {
     .forms-container {
         grid-template-columns: repeat(4, 1fr); /* 4 columnas iguales en pantallas grandes */
