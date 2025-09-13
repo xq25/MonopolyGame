@@ -11,7 +11,8 @@ El IIFE asegura que el código se ejecute en el orden correcto, justo después d
 Sin el IIFE, podrías tener problemas si el script se carga antes de que el HTML esté en el DOM.*/
 
 (function() { // <----- esto es el IIFE, Funcion que se ejecuta inmediatamente despues de ser definida
-    // Seleccion de los formularios de los jugadores por su ID
+
+    // ---- Seleccion de los formularios de los jugadores por su ID ----
     const formRed = document.getElementById('form-red');
     const formBlue = document.getElementById('form-blue');
     const formGreen = document.getElementById('form-green');
@@ -20,21 +21,22 @@ Sin el IIFE, podrías tener problemas si el script se carga antes de que el HTML
     const iconYellow = document.getElementById('addPlayer-yellow');
     const iconGreen = document.getElementById('addPlayer-green');
     const readyBtn = document.getElementById('readyToPlay');
+    
+    // ---- Variables mutables para verificacion o carga de elementos ----
+    let countriesList = []; //Aqui van a ir almacenados nuestros paises para ser reutilizados.
     let activeForms = 0 //Cada que carguemos un nuevo formulario aumentamos su numero y cada que se cierre lo disminuimos para poder validar que todos los formularios esten bien diligenciados para empezar el juego.
-
-    function loadCountries(elementSelector){ //Cambiar la logica para que no este cargando constantemnete los paises, que solo lo cargue una vez y lo reutilice
-        fetch('http://127.0.0.1:5000/countries')  //Llamamos a nuestro endpoint que manda mediante un get la lista de paises
-            .then(response => response.json())
-            .then(data => {
-                data.forEach(country => {
-                    const option = document.createElement('option');
-                    option.value = Object.keys(country)[0]; // Usamos el código del país como valor, Que en este caso es la key de cada json
-                    option.textContent = Object.values(country)[0]; // Mostramos el nombre del país
-                    elementSelector.appendChild(option);
-                });
-            });
+    
+    //Funcion para cargar los paises dentro del select correspondiente de cada formulario.
+    function loadCountries(elementSelector){ //Utilizamos nuestra variable countriesList para cargar todos los select de los formularios.
+        countriesList.forEach(country => {
+            const option = document.createElement('option');
+            option.value = Object.keys(country)[0]; // Usamos el código del país como valor, Que en este caso es la key de cada json
+            option.textContent = Object.values(country)[0]; // Mostramos el nombre del país
+            elementSelector.appendChild(option);
+        });
     }
-    // Función para cargar el formulario de un jugador en el div correspondiente
+
+    // Función para cargar el formulario de un jugador en el div correspondiente.
     function loadForm(elementForm) {
         fetch('/src/pages/formUser.html')
             .then(response => response.text()) //Convertimos nuestra pagina en un string para poder agregarlo mediante innertHTML
@@ -55,12 +57,12 @@ Sin el IIFE, podrías tener problemas si el script se carga antes de que el HTML
                     //Para el resto de los botones debemos verificaar si los clickean para cerrar el formulario
                     closeBtn.addEventListener('click', () => {
                         closeForm(elementForm)
-                        
-                        
                     });
                 } 
             });
     }
+
+    //Funcion para cerrar un formulario al darle al boton "x".
     function closeForm(elementForm){
         let inyeccion = ``
         activeForms -- //Cada que se active la funcion para cerrar un formulario disminuimos la variable.
@@ -87,6 +89,8 @@ Sin el IIFE, podrías tener problemas si el script se carga antes de que el HTML
             });
         }
     }
+
+    //Funcion para salvar o guardar la informacion valida de cada formulario.
     function getPlayerData(formElement) {
         const userForm = formElement.querySelector('.formPlayers'); //Esta clase del elemento es unica para referenciar el formulario cargado (Osea que hay un usuario posible para el juego)
         let response = null
@@ -105,7 +109,8 @@ Sin el IIFE, podrías tener problemas si el script se carga antes de que el HTML
         } 
         return playerDataRestriccions(response, formElement)?response: null; //Si la informacion es valida la rescatamos en un Objeto.
     }
-    //Funcion para salvar la informacion valida de cada formulario
+
+    //Funcion para garantizar la informacion valida de cada formulario.
     function playerDataRestriccions(data, formElement){
         
         let nameValidation = true;
@@ -143,18 +148,26 @@ Sin el IIFE, podrías tener problemas si el script se carga antes de que el HTML
         return (nameValidation && countryValidation) //Solo si todos los campos estan diligenciados se devuelve true.
         
     }
-    // Carga los formularios de los jugadores rojo y azul (*por defecto siempre estan cargados)
+
+    // Carga los formularios de los jugadores rojo y azul (*por defecto siempre estan cargados).
     function basicLoadForm(){
         loadForm(formRed);
         loadForm(formBlue);
     }
 
-    basicLoadForm(); //Cargamos los formularios de los jugadores rojo y azul (por defecto)
-    iconGreen.addEventListener('click', () => {
-        loadForm(formGreen);
-    });
-    iconYellow.addEventListener('click', () => {
-        loadForm(formYellow);
+    //Encapsulamos toda la carga de los formularios despues de que nuestra variable countriesList contenga toda la informacion para el select de los formularios.
+    //Asi nos aseguramos que ningun campo se quede sin su respectiva carga de paises.
+    fetch('http://127.0.0.1:5000/countries')
+        .then(response => response.json()).then(data => {
+            countriesList = data;
+        
+        basicLoadForm(); //Cargamos los formularios de los jugadores rojo y azul (por defecto)
+        iconGreen.addEventListener('click', () => {
+            loadForm(formGreen);
+        });
+        iconYellow.addEventListener('click', () => {
+            loadForm(formYellow);
+        });
     });
     readyBtn.addEventListener('click', () => {
         const infoPlayers = [] //En esta constante se va a guardar toda la informacion de los usuarios que tengan toda su informacion valida para jugar
@@ -172,8 +185,11 @@ Sin el IIFE, podrías tener problemas si el script se carga antes de que el HTML
             //Creamos e invocamos un customEvent que va a ser escuchado desde nuestro index, en el cual pasaremos la informacion de los usuarios para empezar a trabajarla desde alli.
             document.dispatchEvent(new CustomEvent('playersReady', { detail: infoPlayers }));
         }
+
+        //Se podria mostrar un mensaje de alerta general para que se revise bien los formularios y captar la atencion sobre los campos sin diligenciar.
         // else{
         //     alert('Verifica que todos los formularios esten diligenciados')
         // }
+        
     });
 })();

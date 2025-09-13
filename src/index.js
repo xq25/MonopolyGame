@@ -14,11 +14,8 @@ function initializeHomePage() {
     rulesButton.addEventListener("click", () => loadContent(content, "./pages/rulesMonopoly.html"));
    
 }
-document.addEventListener("DOMContentLoaded", () => {
-    initializeHomePage();
-    changeSidebar();
-    playButton.addEventListener("click", () => {
-        loadContent(mainContainer, "/src/pages/selectPlayers.html").then(() => {
+function initializeSelectPlayers(){
+    loadContent(mainContainer, "/src/pages/selectPlayers.html").then(() => {
             // Carga manual del script después de que el contenido se haya cargado, Para asi poder encontrar los elementos que se ejecutan en el script
             let script = document.createElement('script');
             // Asignamos la ruta del script
@@ -27,6 +24,12 @@ document.addEventListener("DOMContentLoaded", () => {
             document.body.appendChild(script);
             // Escuchar el evento personalizado  
         });
+}
+document.addEventListener("DOMContentLoaded", () => {
+    initializeHomePage();
+    changeSidebar();
+    playButton.addEventListener("click", () => {
+        initializeSelectPlayers();
     });
     //Separamos la logica de cada uno de los eventos, ya qu8e por defecto este customEvent solo sucede despues de rellenar de manera correcta los formularios
     //Para cada carga de contenido por fuera, necesitamos crear un script que maneje todo su contenido de forma manual
