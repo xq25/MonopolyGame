@@ -86,7 +86,7 @@ body {
   grid-column: 2;   /* centro exacto */
   width: 250px;
   height: 150px;
-  background: url("/assets/images/logo.png ") no-repeat center/contain;
+  background: url("/src/assets/logo.png") no-repeat center/contain;
 }
 
 /* --- Responsive para móviles --- */
