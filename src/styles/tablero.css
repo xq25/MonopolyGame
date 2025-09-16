@@ -89,4 +89,37 @@ body {
   background: url("/assets/images/logo.png ") no-repeat center/contain;
 }
 
+/* --- Responsive para móviles --- */
+@media (max-width: 600px) {
+  .board {
+    width: 98vw;
+    height: 98vw;
+    min-width: 320px;
+    min-height: 320px;
+    padding: 2px;
+  }
+  #center {
+    grid-row: 2 / 11;
+    grid-column: 2 / 11;
+    font-size: 12px;
+  }
+  .carta {
+    width: 70px;
+    height: 100px;
+    font-size: 12px;
+    margin: 5px;
+  }
+  #logo {
+    width: 120px;
+    height: 60px;
+    background-size: contain;
+  }
+  body {
+    overflow: auto;
+    align-items: flex-start;
+    padding: 10px 0;
+  }
+}
+
+
 
