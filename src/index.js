@@ -37,15 +37,14 @@ document.addEventListener("DOMContentLoaded", () => {
         let script = document.createElement('script')
         const infoPlayers = e.detail; // Extraemos la iformacion mandada desde el customEvent para poder manejar la logica desde aqui
         // Puedes guardar infoPlayers en localStorage, sessionStorage, o pasarlo a tu backend si lo necesitas
-        // Cargar la página del tablero
+        // Cargar la página del tablero.
         loadContent(mainContainer, "/src/pages/tablero.html").then(() => {
             //Cargamos la pagian en la que esta el tablero.
             //reutilizamos la variable scrip, ya que ya no necesitamos el script de selectPlayers. Ahora cargamos la logica del tablero
             script.src = '/src/components/tablero.js'
             document.body.appendChild(script)
         })
-        // Si necesitas pasar infoPlayers al tablero, puedes hacerlo aquí
-        // Por ejemplo: localStorage.setItem('players', JSON.stringify(infoPlayers));
+        //Aqui hay que hacer otra funcion en la cual despues de cargar el tablero se carguen el resto de los elementos e inicie el juego
     }, { once: true }); //Esto nos indica que solo va a escuchar este evento una unica vez. Ya que solo despues de que la info en los formularios este bien, se iniciara el juego
 }); 
 

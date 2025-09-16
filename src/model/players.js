@@ -1,13 +1,14 @@
-class Player {
-    constructor(nick_name, country, color){
+export class Player {
+    constructor(nick_name, country_code, color){
         this.nick_name = nick_name;
-        this.country = country;
+        this.country = country_code;
         this.color = color;
         this.money = 1500;
         this.active = true;
         this.position = 1;
 
     }
+    //Accesores y mutadores de la clase.
     getNickName(){
         return this.nick_name;
     }
