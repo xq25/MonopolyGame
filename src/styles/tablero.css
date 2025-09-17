@@ -121,9 +121,10 @@ body {
   }
   .token{
     /*Debe generar la figura de un circulo*/
+
   }
   #token-red{
-
+    background-color: red;
   }
   #token-blue{
 
@@ -132,7 +133,7 @@ body {
 
   }
   #token-green{
-    
+
   }
 }
 
