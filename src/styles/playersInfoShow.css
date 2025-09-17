@@ -1,0 +1,155 @@
+#player-red {
+  padding: 15px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin: 10px;
+  z-index: 1000;
+  width: 25%;
+  background-color: rgba(255, 0, 0, 0.423); /* Color más suave */
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(255, 0, 0, 0.2); /* Sombra */
+  backdrop-filter: blur(6px); /* Efecto vidrio */
+  color: #fff; /* Texto claro */
+  font-family: Arial, sans-serif;
+}
+
+#player-blue {
+  padding: 15px;
+  position: fixed;
+  top: 0;
+  right: 0;
+  margin: 10px;
+  z-index: 1000;
+  width: 25%;
+  background-color: rgba(0, 0, 255, 0.351);
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 229, 255, 0.2);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  font-family: Arial, sans-serif;
+}
+
+#player-yellow {
+  padding: 15px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  margin: 10px;
+  z-index: 1000;
+  width: 25%;
+  background-color: rgba(255, 255, 0, 0.381);
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(254, 254, 0, 0.2);
+  backdrop-filter: blur(6px);
+  color: #333; /* Texto oscuro para fondo claro */
+  font-family: Arial, sans-serif;
+}
+
+#player-green {
+  padding: 15px;
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  margin: 10px;
+  z-index: 1000;
+  width: 25%;
+  background-color: rgba(0, 128, 0, 0.422);
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(2, 243, 34, 0.2);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  font-family: Arial, sans-serif;
+}
+/* --- TITULO Y BANDERA --- */
+#player-red h2,
+#player-blue h2,
+#player-yellow h2,
+#player-green h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;              /* Separación entre bandera y nombre */
+  font-size: 1.4rem;      /* Tamaño del nombre */
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: inherit;         /* Hereda color del contenedor */
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  padding-bottom: 5px;
+}
+
+#player-red h2 img,
+#player-blue h2 img,
+#player-yellow h2 img,
+#player-green h2 img {
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;       /* Esquinas redondeadas de la bandera */
+  object-fit: cover;        /* Ajuste dentro del recuadro */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* --- PÁRRAFOS DE INFORMACIÓN --- */
+.money-text,
+.properties-text,
+.h\&p-text {
+  font-size: 0.95rem;
+  margin: 8px 0;
+  font-weight: 500;
+}
+
+/* Resaltar “Dinero disponible” */
+.money-text strong {
+  color: #ffd700;           /* Color dorado */
+  font-weight: bold;
+}
+
+/* --- LISTAS --- */
+#player-red ul,
+#player-blue ul,
+#player-yellow ul,
+#player-green ul {
+  list-style-type: none;    /* Quitamos viñetas */
+  padding-left: 0;
+  margin: 6px 0 12px 0;
+}
+
+#player-red ul li,
+#player-blue ul li,
+#player-yellow ul li,
+#player-green ul li {
+  background-color: rgba(255,255,255,0.1);  /* Fondo suave */
+  padding: 6px 10px;
+  border-radius: 6px;
+  margin-bottom: 4px;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease;
+}
+
+#player-red ul li:hover,
+#player-blue ul li:hover,
+#player-yellow ul li:hover,
+#player-green ul li:hover {
+  background-color: rgba(255,255,255,0.2);  /* Hover */
+}
+
+/* --- EFECTOS GLOBALES --- */
+#player-red *:not(img),
+#player-blue *:not(img),
+#player-yellow *:not(img),
+#player-green *:not(img) {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  line-height: 1.4;
+}
+
+/* Si quieres darle un pequeño efecto a todo cuando pasa el mouse */
+#player-red:hover,
+#player-blue:hover,
+#player-yellow:hover,
+#player-green:hover {
+  box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+  transform: scale(1.02);
+  transition: all 0.3s ease;
+}
+.board{
+    position: relative;
+}

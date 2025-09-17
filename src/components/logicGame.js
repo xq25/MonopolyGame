@@ -45,9 +45,38 @@ function playGame(infoPlayers){
 function changePositionPlayer(){
     return 
 }
-function initializePlayersClass(playersList){
+//Esta funcion nos permite inicializar como objetos la informacion de los usuarios que tenemos.
+export function initializePlayersClass(playersList){
     let objectClassList = [];
 
-    objectClassList = playersList.map(item => {new Player(item.nickName, item.country, item.color )})
+    objectClassList = playersList.map(item => { //La funcion map nos permite acceder a cada elemento de una lista para rellenar otra, pero si o si por cada item debe haber un return.
+        return new Player(item.nickName, item.country, item.color ) //Creamos la instancia de cada player.
+    });
     return objectClassList;
+}
+export function loadPlayersInteface(objectListPlayers){
+
+    if (objectListPlayers){
+
+        const gameDiv = document.getElementById('gameDiv');
+        objectListPlayers.forEach(playerInfo => {
+            let divInfoPlayer = document.createElement('div');
+            divInfoPlayer.id = `player-${playerInfo.color}`; //Asignamos el id correspondiente a cada jugar. Esta clase es la que indicara su posicion en la pantalla y las diferencias de colores.
+            divInfoPlayer.classList.add('playerInterface'); //Esta es la clase general que genera el recuadro con el mismo tamaño para todos.
+            divInfoPlayer.innerHTML = `
+                <h2><img src="https://flagsapi.com/${playerInfo.country.toUpperCase()}/flat/64.png" alt="Bandera-${playerInfo.country}" class="flag">${playerInfo.nick_name}</h2>
+                <p class="money-text"><strong>Dinero disponible:</strong> ${playerInfo.money}</p>
+                <p class= "properties-text">Propiedades adquiridas:</p>
+                <ul>
+                    
+                </ul>
+
+                <p class="h&p-text">Hipotecas y préstamos activos:</p>
+                <ul>
+                
+                </ul>
+            `;
+            gameDiv.appendChild(divInfoPlayer); //Agregamos cada recuadro a nuestra visualizacion del juego.
+        });
+    }
 }

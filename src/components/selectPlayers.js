@@ -170,14 +170,14 @@ Sin el IIFE, podrías tener problemas si el script se carga antes de que el HTML
         });
     });
     readyBtn.addEventListener('click', () => {
-        const infoPlayers = [] //En esta constante se va a guardar toda la informacion de los usuarios que tengan toda su informacion valida para jugar
-        const formularios = [formRed, formBlue, formYellow, formGreen]
+        const infoPlayers = []; //En esta constante se va a guardar toda la informacion de los usuarios que tengan toda su informacion valida para jugar
+        const formularios = [formRed, formBlue, formYellow, formGreen];
         formularios.forEach(formElement => {
             //Por cada formulario debemos validar si tiene informacion (activo o inactivo).
             const formData = getPlayerData(formElement);
             if (formData !== null){
                 //Si hay contenido valido y completo en el formulario lo guardamos en nuestra constante
-                infoPlayers.push(formData)
+                infoPlayers.push(formData);
             }
             
         });
@@ -188,9 +188,5 @@ Sin el IIFE, podrías tener problemas si el script se carga antes de que el HTML
         }
 
         //Se podria mostrar un mensaje de alerta general para que se revise bien los formularios y captar la atencion sobre los campos sin diligenciar.
-        // else{
-        //     alert('Verifica que todos los formularios esten diligenciados')
-        // }
-        
     });
 })();
