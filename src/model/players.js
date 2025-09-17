@@ -51,5 +51,5 @@ export class Player {
     }
     setPosition(newPosition){
         this.position = newPosition;
-    }
+    }   
 }
