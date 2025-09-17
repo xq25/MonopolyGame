@@ -42,8 +42,26 @@ function playGame(infoPlayers){
     }
 }
 
-function changePositionPlayer(){
-    return 
+function changePositionPlayer(numDados, infoPlayer, tablero){
+    
+    let posPlayer = infoPlayer.position;
+    
+    const currentBox = tablero.getElementById(posPlayer);
+    const lastToken = currentBox.getElementById(`token-${playerInfo.color}`);
+    currentBox.remove(lastToken);
+
+    if (posPlayer + numDados > 43){
+        posPlayer -= 43;
+    }
+    infoPlayer.position = posPlayer;
+
+    const futureBox = tablero.getElementById(posPlayer);
+
+    const tokenPlayer = document.createElement('div');
+    tokenPlayer.classList.add('token');
+    tokenPlayer.id = `token-${infoPlayer.color}`; 
+    futureBox.appendChild(tokenPlayer);
+    
 }
 //Esta funcion nos permite inicializar como objetos la informacion de los usuarios que tenemos.
 export function initializePlayersClass(playersList){
