@@ -119,22 +119,28 @@ body {
     align-items: flex-start;
     padding: 10px 0;
   }
-  .token{
-    /*Debe generar la figura de un circulo*/
+}
+.token {
+  width: 50%;              /* la mitad del ancho de la casilla */
+  height: 50%;             /* la mitad del alto de la casilla */
+  border-radius: 50%;      /* lo convierte en círculo */
+  margin: auto;            /* centrado dentro de la casilla */
+  border: 2px solid #333;  /* un borde oscuro para resaltar */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3); /* un poco de sombra para dar volumen */
+}
 
-  }
-  #token-red{
-    background-color: red;
-  }
-  #token-blue{
-
-  }
-  #token-yellow{
-
-  }
-  #token-green{
-
-  }
+/* Colores de cada jugador */
+#token-red {
+  background-color: red;
+}
+#token-blue {
+  background-color: blue;
+}
+#token-yellow {
+  background-color: yellow;
+}
+#token-green {
+  background-color: green;
 }
 
 

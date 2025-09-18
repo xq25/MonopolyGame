@@ -1,7 +1,7 @@
 import { loadContent } from './utils/utils.js'; // Importa la función para cargar contenido
 import { changeSidebar } from './components/SidebarToggle.js'; // Importa la función para cambiar la barra lateral
 
-import {loadPlayersInteface, initializePlayersClass} from './components/logicGame.js';
+import {loadPlayersInteface, initializePlayersClass, changePositionPlayer} from './components/logicGame.js';
 
 const mainContainer = document.getElementById("mainContainer"); // Contenedor principal que incluye sidebar y contenido
 const homeButton = document.getElementById("homeButton"); // boton home del Home
@@ -49,8 +49,13 @@ document.addEventListener("DOMContentLoaded", () => {
             document.body.appendChild(script);
         }).then(() => {
             const objectList = initializePlayersClass(infoPlayers);
+            const dashboard = document.getElementById('tablero')
             if (objectList){
-                loadPlayersInteface(objectList);
+                
+                objectList.forEach(player => {
+                    loadPlayersInteface(player);
+                });
+                changePositionPlayer(3, objectList[0], dashboard);
             }
         })
 

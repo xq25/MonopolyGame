@@ -5,46 +5,63 @@ function playGame(infoPlayers){
     let endGame = false;
     let turn = 0;
     const maxTurn = infoPlayers.length; //Almacenamos la cantidad de players que se tienen dentro del juego para poder manejar los turnos.
+    const dashboard = document.getElementById('tablero');
+    function endGameBrokeCondition(infoPlayers){
 
-    function endGameForBroke(infoPlayers){
-        const playersBroke = []
-        let endGameBrokeCondition = false;
+        const playersBroke = [];
+        let endGameCondition = false;
+
         infoPlayers.forEach(player => {
             if (player.money <= 0 && player.propierties.length === 0){
-                playersBroke.push(player)
+                playersBroke.push(player);
             }  
         });
         if (playersBroke.length === maxTurn-1){ //Si solo hay un jugador que no este en banca rota, se acaba el juego.
-            endGameBrokeCondition = true;
+            endGameCondition = true;
         }
 
-        return endGameBrokeCondition;
+        return endGameCondition;
     }
 
     //Estructura basica del juego
     while (!endGame){
         if (infoPlayers[turn].active){
             //funcion de mostrar los dados y tirarlos
+            // let numDados = funcioTirarDados();
+
+            //Funcion para mover al player
+            // changePositionPlayer(numDados, infoPlayers[turn], dashboard)
+
+            // let action = {} //Acciones despues de caer sobre una casilla, este metodo debe devolver un objeto con el emetodo a realizar y el valor de agregacion o eliminacion sobre ciertos atributos de las clases.
+            
+            if (Object.keys(action).length !== 0){ //Esto nos indica que la funcion si nos devolvio instrucciones de cambio para atributos de las clases.
+                //Modificar el atributo correspondiente.
 
 
-
-            //Acciones posibles despues de tirar los dados
-            //Modificar al objeto de cada usuario
+                //Funcion de cargar nuevamente la informacion del player.
+                // loadPlayersInteface(infoPlayers[turn])
+            }
+            
         }
         else{
             //Acciones posibles para volver a estar activo
+            // Si funciona modificar al player correspondiente.
+            
+            //Cargamos nuevamente la informacion del player 
+            // loadPlayersInteface(infoPlayers[turn])
+
         }
         turn ++;
         if (turn === maxTurn){
-
             turn = 0;
         }
     }
 }
 
-function changePositionPlayer(numDados, infoPlayer, tablero){
+export function changePositionPlayer(numDados, infoPlayer, tablero){
     
     let posPlayer = infoPlayer.position;
+    console.log(posPlayer)
     
     const currentBox = tablero.getElementById(posPlayer);
     const lastToken = currentBox.getElementById(`token-${playerInfo.color}`);
@@ -63,7 +80,7 @@ function changePositionPlayer(numDados, infoPlayer, tablero){
     futureBox.appendChild(tokenPlayer);
     
 }
-//Esta funcion nos permite inicializar como objetos la informacion de los usuarios que tenemos.
+//Esta funcion nos permite inicializar como objetos la informacion de los usuarios que tenemos y almacenarlos en una lista([]).
 export function initializePlayersClass(playersList){
     let objectClassList = [];
 
@@ -72,29 +89,29 @@ export function initializePlayersClass(playersList){
     });
     return objectClassList;
 }
-export function loadPlayersInteface(objectListPlayers){
+//Esta funcion nos permite cargar la informacion de cada jugador. Vamos a reutilizarla al detectar cambios a medida que pasa el juego.
+export function loadPlayersInteface(objectPlayer){
 
-    if (objectListPlayers){
+    if (objectPlayer){
 
         const gameDiv = document.getElementById('gameDiv');
-        objectListPlayers.forEach(playerInfo => {
-            let divInfoPlayer = document.createElement('div');
-            divInfoPlayer.id = `player-${playerInfo.color}`; //Asignamos el id correspondiente a cada jugar. Esta clase es la que indicara su posicion en la pantalla y las diferencias de colores.
-            divInfoPlayer.classList.add('playerInterface'); //Esta es la clase general que genera el recuadro con el mismo tamaño para todos.
-            divInfoPlayer.innerHTML = `
-                <h2><img src="https://flagsapi.com/${playerInfo.country.toUpperCase()}/flat/64.png" alt="Bandera-${playerInfo.country}" class="flag">${playerInfo.nick_name}</h2>
-                <p class="money-text"><strong>Dinero disponible:</strong> ${playerInfo.money}</p>
-                <p class= "properties-text">Propiedades adquiridas:</p>
-                <ul>
-                    
-                </ul>
-
-                <p class="h&p-text">Hipotecas y préstamos activos:</p>
-                <ul>
+        
+        let divInfoPlayer = document.createElement('div');
+        divInfoPlayer.id = `player-${objectPlayer.color}`; //Asignamos el id correspondiente a cada jugar. Esta clase es la que indicara su posicion en la pantalla y las diferencias de colores.
+        divInfoPlayer.classList.add('playerInterface'); //Esta es la clase general que genera el recuadro con el mismo tamaño para todos.
+        divInfoPlayer.innerHTML = `
+            <h2><img src="https://flagsapi.com/${objectPlayer.country.toUpperCase()}/flat/64.png" alt="Bandera-${objectPlayer.country}" class="flag">${objectPlayer.nick_name}</h2>
+            <p class="money-text"><strong>Dinero disponible:</strong> ${objectPlayer.money}</p>
+            <p class= "properties-text">Propiedades adquiridas:</p>
+            <ul>
                 
-                </ul>
-            `;
-            gameDiv.appendChild(divInfoPlayer); //Agregamos cada recuadro a nuestra visualizacion del juego.
-        });
+            </ul>
+
+            <p class="h&p-text">Hipotecas y préstamos activos:</p>
+            <ul>
+            
+            </ul>
+        `;
+        gameDiv.appendChild(divInfoPlayer); //Agregamos cada recuadro a nuestra visualizacion del juego.
     }
 }
