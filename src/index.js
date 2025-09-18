@@ -2,6 +2,7 @@ import { loadContent } from './utils/utils.js'; // Importa la función para carg
 import { changeSidebar } from './components/SidebarToggle.js'; // Importa la función para cambiar la barra lateral
 
 import {loadPlayersInteface, initializePlayersClass} from './components/logicGame.js';
+import { eventBox } from './components/logicGame.js'
 
 const mainContainer = document.getElementById("mainContainer"); // Contenedor principal que incluye sidebar y contenido
 const homeButton = document.getElementById("homeButton"); // boton home del Home
@@ -47,12 +48,14 @@ document.addEventListener("DOMContentLoaded", () => {
             //reutilizamos la variable scrip, ya que ya no necesitamos el script de selectPlayers. Ahora cargamos la logica del tablero
             script.src = '/src/components/tablero.js';
             document.body.appendChild(script);
-        }).then(() => {
-            const objectList = initializePlayersClass(infoPlayers);
-            if (objectList){
-                loadPlayersInteface(objectList);
+            document.addEventListener('boardReady', () => {//Ejecutamos el evento de las casillas ya cuando el tablero este listo y cargado completamente 
+                const objectList = initializePlayersClass(infoPlayers); //Inicialiazamos a los jugadores 
+                if (objectList){//si el objeto es true inicalizamos los jugadores y eventos de casillas
+                loadPlayersInteface(objectList); 
+                eventBox('4');
             }
-        })
+            }, { once: true }); //hace que el listener se auto-elimine después de ejecutarse una vez.
+        });
 
         
         
