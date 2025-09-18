@@ -25,6 +25,7 @@ function playGame(infoPlayers){
     while (!endGame){
         if (infoPlayers[turn].active){
             //funcion de mostrar los dados y tirarlos
+        
 
 
 
@@ -79,4 +80,49 @@ export function loadPlayersInteface(objectListPlayers){
             gameDiv.appendChild(divInfoPlayer); //Agregamos cada recuadro a nuestra visualizacion del juego.
         });
     }
+}
+export function eventBox(numDice){
+      //Logica al caer en las casillas dependiendo del type
+  const casilla = document.getElementById(numDice); // debe ir como parametro el resultado de los dados
+  // if (!casilla) {
+  //   console.error(`No existe una casilla con id ${numDice}`);
+  //   return;
+  // } Mensaje de deouracion para ber si si entraba el el id correspondiente
+  const tipo = casilla.getAttribute('data-type');
+  //const nombre = casilla.getName('data-name') (no se si es necesario entrar al nombre)
+  //CAJA COMUNIDAD 
+  if (tipo === 'community_chest'){//tener cuidado respecto al valor de validacion ya que debe ser el mismo del backend
+  // lógica para tomar una carta de comunidad
+    
+  } else if (tipo === 'chance') {
+  // Lógica para carta de suerte
+    
+  } else if (tipo === 'property') {
+    // Lógica para propiedades (comprar, pagar renta, etc.)
+    
+  }else if (tipo === 'special') {
+    if (casilla.id === '20'){
+      console.log("PARQUEO GRATISS")
+    }
+    // Lógica para casillas especiales (salida, cárcel, etc
+  }else if(tipo === 'tax'){
+    // Logica para quitar dinero por impuestos
+    if (casilla.id === "4"){
+      console.log("DAS 200 DE IMPUESTOS")//donde van los mensajes en consola debemos acceder al objeto jugador para hacer la accion correspondiente 
+      
+    }else if (casilla.id === "12"){
+      console.log("Das 50 de impuestos")
+
+    }else if (casilla.id === "28"){
+      console.log("Das 50 de impuestos")
+
+    }else if (casilla.id === "38"){
+      console.log("Das 100 de impuestos")
+
+    }
+    //Aqui ya estarian todos los tax hechos 
+  }
+  else if(tipo === 'railroad'){
+    // logica para los ferrocarriles
+  }
 }

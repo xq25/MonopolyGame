@@ -11,7 +11,7 @@ function makeSquare(tile) { //creamos las casillas
   }
    // Guardamos el tipo de casilla como atributo
   if (tile.type) { //si la casilla tiene tipo, se lo asignamos como atributo data-type
-    div.setAttribute('data-type', tile.type);
+    div.setAttribute('data-type', tile.type);    
   }
 // se le agrega manualmente el nombre a la salida
   // if (tile.name){
@@ -76,44 +76,6 @@ fetch(url)
         }
       });
     });
-
-    //Logica al caer en las casillas dependiendo del type
-    const casilla = document.getElementById('4'); // debe ir como parametro el resultado de los dados
-    const tipo = casilla.getAttribute('data-type');
-    //const nombre = casilla.getName('data-name') (no se si es necesario entrar al nombre)
-    //CAJA COMUNIDAD 
-    if (tipo === 'community_chest'){//tener cuidado respecto al valor de validacion ya que debe ser el mismo del backend
-    // lógica para tomar una carta de comunidad
-      
-    } else if (tipo === 'chance') {
-    // Lógica para carta de suerte
-      
-    } else if (tipo === 'property') {
-      // Lógica para propiedades (comprar, pagar renta, etc.)
-      
-    }else if (tipo === 'special') {
-      if (casilla.id === '20'){
-        console.log("PARQUEO GRATISS")
-      }
-      // Lógica para casillas especiales (salida, cárcel, etc
-    }else if(tipo === 'tax'){
-      // Logica para quitar dinero por impuestos
-      if (casilla.id === "4"){
-        console.log("DAS 200 DE IMPUESTOS")//donde van los mensajes en consola debemos acceder al objeto jugador para hacer la accion correspondiente 
-        
-      }else if (casilla.id === "12"){
-        console.log("Das 50 de impuestos")
-
-      }else if (casilla.id === "28"){
-        console.log("Das 50 de impuestos")
-
-      }else if (casilla.id === "38"){
-        console.log("Das 100 de impuestos")
-
-      }
-      //Aqui ya estarian todos los tax hechos 
-    }
-    else if(tipo === 'railroad'){
-      // logica para los ferrocarriles
-    }
+    //debemos colocar el evento de tablero ready para que se coloquen justo despues que las casillas se ccreen en el DOM
+    document.dispatchEvent(new Event('boardReady'));
   });
