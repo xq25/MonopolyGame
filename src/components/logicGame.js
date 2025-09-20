@@ -115,4 +115,3 @@ export function loadPlayerInteface(objectPlayer){
         gameDiv.appendChild(divInfoPlayer); //Agregamos cada recuadro a nuestra visualizacion del juego.
     }
 }
-
