@@ -1,7 +1,7 @@
 import { loadContent } from './utils/utils.js'; // Importa la función para cargar contenido
 import { changeSidebar } from './components/SidebarToggle.js'; // Importa la función para cambiar la barra lateral
 
-import {loadPlayersInteface, initializePlayersClass, changePositionPlayer} from './components/logicGame.js';
+import {loadPlayerInteface, initializePlayersClass} from './components/logicGame.js';
 
 const mainContainer = document.getElementById("mainContainer"); // Contenedor principal que incluye sidebar y contenido
 const homeButton = document.getElementById("homeButton"); // boton home del Home
@@ -49,18 +49,10 @@ document.addEventListener("DOMContentLoaded", () => {
             document.body.appendChild(script);
         }).then(() => {
             const objectList = initializePlayersClass(infoPlayers);
-            const dashboard = document.getElementById('tablero')
-            if (objectList){
-                
-                objectList.forEach(player => {
-                    loadPlayersInteface(player);
-                });
-                changePositionPlayer(3, objectList[0], dashboard);
-            }
-        })
-
-        
-        
+            objectList.forEach(player => {
+                loadPlayerInteface(player)
+            });
+        });
         //Aqui hay que hacer otra funcion en la cual despues de cargar el tablero se carguen el resto de los elementos e inicie el juego
     }, { once: true }); //Esto nos indica que solo va a escuchar este evento una unica vez. Ya que solo despues de que la info en los formularios este bien, se iniciara el juego.
     

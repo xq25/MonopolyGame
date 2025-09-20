@@ -1,58 +1,59 @@
-/* ---- ESTILOS BASE ---- */
+/* Estilos principales para el fondo y la organización general de la página */
 body {
-  font-family: Arial, sans-serif;
-  background: #f5f5f5;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 0;
-  height: 100vh;        /* ocupar toda la ventana */
-  overflow: hidden;
+  font-family: Arial, sans-serif;      /* Tipo de letra sencillo y claro */
+  background: #f5f5f5;                 /* Fondo gris claro */
+  display: flex;                       /* Usamos flexbox para centrar el contenido */
+  justify-content: center;             /* Centra horizontalmente */
+  align-items: center;                 /* Centra verticalmente */
+  margin: 0;                           /* Quitamos los márgenes por defecto */
+  height: 100vh;                       /* Ocupa toda la altura de la ventana */
+  overflow: hidden;                    /* Oculta el scroll */
 }
 
-/* ---- TABLERO ---- */
+/* El tablero principal del juego, cuadrado y centrado */
 .board {
-  height: 95vmin;       /* cuadrado, siempre según el lado menor */
+  height: 95vmin;                      /* El tablero es casi tan grande como la ventana */
   width: 95vmin;
-  display: grid;
-  grid-template-rows: repeat(11, 1fr);     /* 11 filas iguales */
-  grid-template-columns: repeat(11, 1fr);  /* 11 columnas iguales */
-  gap: 2px;
-  background: #333;
+  display: grid;                       /* Usamos grid para organizar las casillas */
+  grid-template-rows: repeat(11, 1fr); /* 11 filas iguales */
+  grid-template-columns: repeat(11, 1fr); /* 11 columnas iguales */
+  gap: 2px;                            /* Espacio entre casillas */
+  background: #333;                    /* Fondo oscuro para el tablero */
   box-sizing: border-box;
-  padding: 5px;
-  box-shadow: 2px solid #333;
+  padding: 5px;                        /* Espacio interno */
+  box-shadow: 2px solid #333;          /* Borde oscuro */
 }
 
-/* ---- CASILLAS ---- */
+/* Cada casilla del tablero */
 .square {
-  background: white;
-  border: 1px solid #999;
-  font-size: 9px;
-  text-align: center;
-  display: flex;
+  background: white;                   /* Fondo blanco */
+  border: 1px solid #999;              /* Borde gris */
+  font-size: 9px;                      /* Texto pequeño */
+  text-align: center;                  /* Centra el texto */
+  display: flex;                       /* Flex para organizar el contenido verticalmente */
   flex-direction: column;
   justify-content: space-between;
 }
 
+/* Barra de color en algunas casillas */
 .color-bar {
   height: 10px;
   width: 100%;
 }
 
-/* ---- CENTRO ---- */
+/* Zona central del tablero */
 #center {
-  grid-row: 2 / 11;      /* ocupa filas 2 a 10 */
-  grid-column: 2 / 11;   /* ocupa columnas 2 a 10 */
+  grid-row: 2 / 11;                    /* Ocupa el centro del tablero */
+  grid-column: 2 / 11;
   display: grid;
   grid-template-rows: 1fr 2fr 1fr;
   grid-template-columns: 1fr 1fr 1fr;
-  background: #f5f5f5;   /* mismo color que el fondo */
+  background: #f5f5f5;                 /* Fondo igual al de la página */
   align-items: center;
   justify-items: center;
 }
 
-/* ---- CARTAS ---- */
+/* Cartas de comunidad y suerte */
 .carta {
   width: 100px;
   height: 150px;
@@ -62,37 +63,37 @@ body {
   align-items: center;
   justify-content: center;
   font-weight: bold; 
-  border-radius: 20px;
+  border-radius: 20px;                 /* Esquinas redondeadas */
   margin: 10px ;
 }
 
-/* Posiciones estilo Monopoly */
+/* Posición de la carta de comunidad (arriba al centro) */
 #cajaComunidad {
   grid-row: 1;
-  grid-column: 2;   /* arriba al centro */
+  grid-column: 2;
   background-color: lightblue;
-
 }
 
+/* Posición de la carta de suerte (abajo al centro) */
 #cajaSuerte {
   grid-row: 3;
-  grid-column: 2;   /* abajo al centro */
+  grid-column: 2;
   background-color: lightgreen;
 }
 
-/* ---- LOGO ---- */
+/* Logo en el centro del tablero */
 #logo {
   grid-row: 2;
-  grid-column: 2;   /* centro exacto */
+  grid-column: 2;
   width: 250px;
   height: 150px;
   background: url("/src/assets/logo.png") no-repeat center/contain;
 }
 
-/* --- Responsive para móviles --- */
+/* Cambios para cuando se ve en celulares o pantallas pequeñas */
 @media (max-width: 600px) {
   .board {
-    width: 98vw;
+    width: 98vw;                       /* El tablero ocupa casi todo el ancho de la pantalla */
     height: 98vw;
     min-width: 320px;
     min-height: 320px;
@@ -101,22 +102,22 @@ body {
   #center {
     grid-row: 2 / 11;
     grid-column: 2 / 11;
-    font-size: 12px;
+    font-size: 12px;                   /* Texto un poco más grande */
   }
   .carta {
-    width: 70px;
+    width: 70px;                       /* Cartas más pequeñas */
     height: 100px;
     font-size: 12px;
     margin: 5px;
   }
   #logo {
-    width: 120px;
+    width: 120px;                      /* Logo más pequeño */
     height: 60px;
     background-size: contain;
   }
   body {
-    overflow: auto;
-    align-items: flex-start;
+    overflow: auto;                    /* Permite hacer scroll si es necesario */
+    align-items: flex-start;            /* El contenido empieza desde arriba */
     padding: 10px 0;
   }
 }

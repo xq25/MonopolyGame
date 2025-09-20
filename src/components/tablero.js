@@ -4,6 +4,20 @@ const url = "http://127.0.0.1:5000/board";
 function makeSquare(tile) { //creamos las casillas
   const div = document.createElement("div"); // creamos un div para estas en los bordes
   div.className = "square";
+  //Agregamos todo esto al html:SQUAREEEE
+  //no es necesario hacer una funcion ya que desde aca se la podemos asignar(mucho mas rapido jaja)
+  if (tile.id) { // si la casilla tiene id
+    div.id = tile.id; // se lo asignamos al div
+  }
+   // Guardamos el tipo de casilla como atributo
+  if (tile.type) { //si la casilla tiene tipo, se lo asignamos como atributo data-type
+    div.setAttribute('data-type', tile.type);    
+  }
+// se le agrega manualmente el nombre a la salida
+  // if (tile.name){
+  //   div.setName('data-name', tile.name)
+  // }
+
 
   if (tile.color) {
     const color = document.createElement("div");// si tiene color, creamos un div para el color y se lo colocamos arriba
@@ -13,7 +27,7 @@ function makeSquare(tile) { //creamos las casillas
   }
 
   const name = document.createElement("div");
-  name.textContent = tile.name; // le asignamos el nombre a la casilla
+  name.textContent = tile.name; // le asignamos el nombre y inyectamos a la casilla en el tablero
   div.appendChild(name);
 
   return div;
@@ -62,4 +76,6 @@ fetch(url)
         }
       });
     });
+    //debemos colocar el evento de tablero ready para que se coloquen justo despues que las casillas se ccreen en el DOM
+    document.dispatchEvent(new Event('boardReady'));
   });

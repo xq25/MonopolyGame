@@ -1,4 +1,6 @@
 import { Player } from '../model/players.js'
+// Estructura para guardar los dueños de propiedades
+const propertyOwners = {}; // { 'idPropiedad': 'nombreJugador' }
 const endButton = document.getElementById('endGameBtn')//Boton para finalizar el juego manualmente
 
 function playGame(infoPlayers){
@@ -87,9 +89,10 @@ export function initializePlayersClass(playersList){
     return objectClassList;
 }
 //Esta funcion nos permite cargar la informacion de cada jugador. Vamos a reutilizarla al detectar cambios a medida que pasa el juego.
-export function loadPlayersInteface(objectPlayer){
+export function loadPlayerInteface(objectPlayer){
 
     if (objectPlayer){
+        console.log(objectPlayer.country)
 
         const gameDiv = document.getElementById('gameDiv');
         
