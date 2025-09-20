@@ -27,18 +27,17 @@ function playGame(infoPlayers){
     while (!endGame){
         if (infoPlayers[turn].active){
             //funcion de mostrar los dados y tirarlos
-            // let numDados = funcioTirarDados();
+            // funcionTirarDados().then(numDice => { changePosition (numeDice, info) })
 
-            //Funcion para mover al player
-            // changePositionPlayer(numDados, infoPlayers[turn], dashboard)
+            // Funcion para mover al player
+            // changePositionPlayer(numDice, infoPlayers[turn], dashboard);
 
-            // let action = {} //Acciones despues de caer sobre una casilla, este metodo debe devolver un objeto con el emetodo a realizar y el valor de agregacion o eliminacion sobre ciertos atributos de las clases.
+            // let action = {} // Acciones despues de caer sobre una casilla, este metodo debe devolver un objeto con el emetodo a realizar y el valor de agregacion o eliminacion sobre ciertos atributos de las clases.
             
-            if (Object.keys(action).length !== 0){ //Esto nos indica que la funcion si nos devolvio instrucciones de cambio para atributos de las clases.
-                //Modificar el atributo correspondiente.
+            if (Object.keys(action).length !== 0){ // Esto nos indica que la funcion si nos devolvio instrucciones de cambio para atributos de las clases.
+                // Modificar el atributo correspondiente.
 
-
-                //Funcion de cargar nuevamente la informacion del player.
+                // Funcion de cargar nuevamente la informacion del player.
                 // loadPlayersInteface(infoPlayers[turn])
             }
             
@@ -57,11 +56,9 @@ function playGame(infoPlayers){
         }
     }
 }
-
 export function changePositionPlayer(numDados, infoPlayer, tablero){
     
     let posPlayer = infoPlayer.position;
-    console.log(posPlayer)
     
     const currentBox = tablero.getElementById(posPlayer);
     const lastToken = currentBox.getElementById(`token-${playerInfo.color}`);
@@ -75,8 +72,8 @@ export function changePositionPlayer(numDados, infoPlayer, tablero){
     const futureBox = tablero.getElementById(posPlayer);
 
     const tokenPlayer = document.createElement('div');
-    tokenPlayer.classList.add('token');
-    tokenPlayer.id = `token-${infoPlayer.color}`; 
+    tokenPlayer.classList.add('token'); //Dibuja un circulo
+    tokenPlayer.id = `token-${infoPlayer.color}`;  //Pinta el circulo
     futureBox.appendChild(tokenPlayer);
     
 }
@@ -115,3 +112,4 @@ export function loadPlayersInteface(objectPlayer){
         gameDiv.appendChild(divInfoPlayer); //Agregamos cada recuadro a nuestra visualizacion del juego.
     }
 }
+

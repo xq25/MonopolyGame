@@ -5,7 +5,7 @@ export class Player {
         this.color = color;
         this.money = 1500;
         this.active = true;
-        this.position = 1;
+        this.position = 0;
 
     }
     //Accesores y mutadores de la clase.
