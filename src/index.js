@@ -46,6 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
         loadContent(mainContainer, "/src/pages/tablero.html").then(() => {
             //Cargamos la pagian en la que esta el tablero.
             //reutilizamos la variable scrip, ya que ya no necesitamos el script de selectPlayers. Ahora cargamos la logica del tablero
+            script.type = 'module';
             script.src = '/src/components/tablero.js';
             document.body.appendChild(script);
             document.addEventListener('boardReady', () => {//Ejecutamos el evento de las casillas ya cuando el tablero este listo y cargado completamente 

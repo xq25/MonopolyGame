@@ -13,6 +13,15 @@ body {
   transition: transform 0.2s ease-in-out;
 }
 
+.dice-section{
+  position: absolute;
+  top: 200px; 
+  left: 45%;
+  transform: translateX(-50%);
+  z-index: 10;
+  width: 300px; 
+}
+
 .result.animate {
   transform: scale(1.2);
   color: #007bff;
@@ -63,9 +72,20 @@ body {
 }
 
 @media (max-width: 500px) {
+  .dice-section {
+    position: static;
+    transform: none;
+    width: 100vw;
+    min-width: unset;
+    max-width: unset;
+    padding: 0;
+    margin: 0 auto;
+  }
   .card {
     width: 98vw;
     padding: 1rem !important;
+    min-width: unset;
+    max-width: unset;
   }
   .dice-container {
     flex-direction: column;
@@ -87,5 +107,9 @@ body {
   .mt-3 input[type="number"] {
     width: 70px;
     font-size: 1rem;
+  }
+  #rollButton {
+    font-size: 1.1rem;
+    padding: 0.6rem 1.2rem;
   }
 }

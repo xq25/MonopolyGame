@@ -1,3 +1,5 @@
+import { initCraps } from "./craps.js";
+
 const board = document.getElementById("board");
 const url = "http://127.0.0.1:5000/board";
 
@@ -76,6 +78,7 @@ fetch(url)
         }
       });
     });
+    initCraps();
     //debemos colocar el evento de tablero ready para que se coloquen justo despues que las casillas se ccreen en el DOM
     document.dispatchEvent(new Event('boardReady'));
   });
