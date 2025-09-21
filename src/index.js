@@ -1,7 +1,7 @@
 import { loadContent } from './utils/utils.js'; // Importa la función para cargar contenido
 import { changeSidebar } from './components/SidebarToggle.js'; // Importa la función para cambiar la barra lateral
 
-import {loadPlayerInteface, initializePlayersClass} from './components/logicGame.js';
+import {loadPlayersInteface, initializePlayersClass} from './components/logicGame.js';
 
 const mainContainer = document.getElementById("mainContainer"); // Contenedor principal que incluye sidebar y contenido
 const homeButton = document.getElementById("homeButton"); // boton home del Home
@@ -45,12 +45,13 @@ document.addEventListener("DOMContentLoaded", () => {
         loadContent(mainContainer, "/src/pages/tablero.html").then(() => {
             //Cargamos la pagian en la que esta el tablero.
             //reutilizamos la variable scrip, ya que ya no necesitamos el script de selectPlayers. Ahora cargamos la logica del tablero
+            script.type = 'module';
             script.src = '/src/components/tablero.js';
             document.body.appendChild(script);
         }).then(() => {
             const objectList = initializePlayersClass(infoPlayers);
             objectList.forEach(player => {
-                loadPlayerInteface(player)
+                loadPlayersInteface(player)
             });
         });
         //Aqui hay que hacer otra funcion en la cual despues de cargar el tablero se carguen el resto de los elementos e inicie el juego
