@@ -1,8 +1,7 @@
 import { loadContent } from './utils/utils.js'; // Importa la función para cargar contenido
 import { changeSidebar } from './components/SidebarToggle.js'; // Importa la función para cambiar la barra lateral
 
-import {loadPlayersInteface, initializePlayersClass} from './components/logicGame.js';
-import { eventBox } from './components/logicGame.js';
+import {loadPlayerInteface, initializePlayersClass} from './components/logicGame.js';
 
 const mainContainer = document.getElementById("mainContainer"); // Contenedor principal que incluye sidebar y contenido
 const homeButton = document.getElementById("homeButton"); // boton home del Home
@@ -49,21 +48,12 @@ document.addEventListener("DOMContentLoaded", () => {
             script.type = 'module';
             script.src = '/src/components/tablero.js';
             document.body.appendChild(script);
-            document.addEventListener('boardReady', () => {//Ejecutamos el evento de las casillas ya cuando el tablero este listo y cargado completamente 
-                const objectList = initializePlayersClass(infoPlayers); //Inicialiazamos a los jugadores 
-                if (objectList){//si el objeto es true inicalizamos los jugadores y eventos de casillas
-                loadPlayersInteface(objectList); 
-                //mensaje de depuracion 
-                if (objectList && objectList.length > 0) {
-                    const currentPlayer = objectList[0]; // El primer jugador comienza
-                    eventBox('4', currentPlayer, objectList);
-            }
-            }
-            }, { once: true }); //hace que el listener se auto-elimine después de ejecutarse una vez.
+        }).then(() => {
+            const objectList = initializePlayersClass(infoPlayers);
+            objectList.forEach(player => {
+                loadPlayerInteface(player)
+            });
         });
-
-        
-        
         //Aqui hay que hacer otra funcion en la cual despues de cargar el tablero se carguen el resto de los elementos e inicie el juego
     }, { once: true }); //Esto nos indica que solo va a escuchar este evento una unica vez. Ya que solo despues de que la info en los formularios este bien, se iniciara el juego.
     
