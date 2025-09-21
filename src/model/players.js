@@ -6,6 +6,7 @@ export class Player {
         this.money = 1500;
         this.active = true;
         this.position = 1;
+        this.properties = []; // Para guardar propiedades
 
     }
     //Accesores y mutadores de la clase.
@@ -51,5 +52,13 @@ export class Player {
     }
     setPosition(newPosition){
         this.position = newPosition;
-    }   
+    }
+    // Metodos de carcell   
+    isJailed(){
+        return this.jailed;
+    }
+
+    setJailed(value){
+        this.jailed = value;
+    }
 }
