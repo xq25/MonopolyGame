@@ -1,29 +1,9 @@
 import { Player } from '../model/players.js'
-// Estructura para guardar los dueños de propiedades
-const propertyOwners = {}; // { 'idPropiedad': 'nombreJugador' }
-const endButton = document.getElementById('endGameBtn')//Boton para finalizar el juego manualmente
 
 function playGame(infoPlayers){
     let endGame = false;
     let turn = 0;
     const maxTurn = infoPlayers.length; //Almacenamos la cantidad de players que se tienen dentro del juego para poder manejar los turnos.
-    const dashboard = document.getElementById('tablero');
-    function endGameBrokeCondition(infoPlayers){
-
-        const playersBroke = [];
-        let endGameCondition = false;
-
-        infoPlayers.forEach(player => {
-            if (player.money <= 0 && player.propierties.length === 0){
-                playersBroke.push(player);
-            }  
-        });
-        if (playersBroke.length === maxTurn-1){ //Si solo hay un jugador que no este en banca rota, se acaba el juego.
-            endGameCondition = true;
-        }
-
-        return endGameCondition;
-    }
 
     //Estructura basica del juego
     while (!endGame){
@@ -59,26 +39,35 @@ function playGame(infoPlayers){
     }
 }
 export function changePositionPlayer(numDados, infoPlayer, tablero){
-    
-    let posPlayer = infoPlayer.position;
-    
-    const currentBox = tablero.getElementById(posPlayer);
-    const lastToken = currentBox.getElementById(`token-${playerInfo.color}`);
-    currentBox.remove(lastToken);
+    // Calcula la nueva posición del jugador
+    let posPlayer = infoPlayer.position + numDados;
+    if (posPlayer > 40){
+        posPlayer -= 40;
+    } 
 
-    if (posPlayer + numDados > 43){
-        posPlayer -= 43;
-    }
     infoPlayer.position = posPlayer;
 
-    const futureBox = tablero.getElementById(posPlayer);
+    // Busca la casilla correspondiente usando el id generado en tablero.js
+    const targetSquare = document.getElementById(`square-${posPlayer}`)
+    console.log(targetSquare)
+    if (!targetSquare) {
+        console.error(`No existe la casilla con id="square-${posPlayer}" en el tablero.`);
+        return;
+    }
 
+    // Elimina el token anterior si existe
+    const oldToken = tablero.querySelector(`#token-${infoPlayer.color}`);
+    if (oldToken){
+        oldToken.remove();
+    }
+
+    // Crea y agrega el nuevo token
     const tokenPlayer = document.createElement('div');
-    tokenPlayer.classList.add('token'); //Dibuja un circulo
-    tokenPlayer.id = `token-${infoPlayer.color}`;  //Pinta el circulo
-    futureBox.appendChild(tokenPlayer);
-    
+    tokenPlayer.classList.add('token');
+    tokenPlayer.id = `token-${infoPlayer.color}`;
+    targetSquare.appendChild(tokenPlayer);
 }
+
 //Esta funcion nos permite inicializar como objetos la informacion de los usuarios que tenemos y almacenarlos en una lista([]).
 export function initializePlayersClass(playersList){
     let objectClassList = [];
@@ -92,7 +81,6 @@ export function initializePlayersClass(playersList){
 export function loadPlayerInteface(objectPlayer){
 
     if (objectPlayer){
-        console.log(objectPlayer.country)
 
         const gameDiv = document.getElementById('gameDiv');
         
@@ -114,4 +102,20 @@ export function loadPlayerInteface(objectPlayer){
         `;
         gameDiv.appendChild(divInfoPlayer); //Agregamos cada recuadro a nuestra visualizacion del juego.
     }
+}
+function endGameBrokeCondition(infoPlayers){
+
+        const playersBroke = [];
+        let endGameCondition = false;
+
+        infoPlayers.forEach(player => {
+            if (player.money <= 0 && player.propierties.length === 0){
+                playersBroke.push(player);
+            }  
+        });
+        if (playersBroke.length === maxTurn-1){ //Si solo hay un jugador que no este en banca rota, se acaba el juego.
+            endGameCondition = true;
+        }
+
+        return endGameCondition;
 }
