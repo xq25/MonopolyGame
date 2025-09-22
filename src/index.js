@@ -1,7 +1,7 @@
 import { loadContent } from './utils/utils.js'; // Importa la función para cargar contenido
 import { changeSidebar } from './components/SidebarToggle.js'; // Importa la función para cambiar la barra lateral
 
-import {loadPlayersInteface, initializePlayersClass} from './components/logicGame.js';
+import {loadPlayerInteface, initializePlayersClass} from './components/logicGame.js';
 
 import { cargarRanking } from './components/ranking.js'; // Importa la función para cargar el ranking
 
@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }).then(() => {
             const objectList = initializePlayersClass(infoPlayers);
             objectList.forEach(player => {
-                loadPlayersInteface(player)
+                loadPlayerInteface(player)
             });
         });
         //Aqui hay que hacer otra funcion en la cual despues de cargar el tablero se carguen el resto de los elementos e inicie el juego
