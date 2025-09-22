@@ -10,6 +10,11 @@ function makeSquare(tile) { //creamos las casillas
   if (tile.id !== undefined) { // si la casilla tiene id
     div.id = `square-${tile.id}`; // se lo asignamos al div
   }
+
+  // AÑADE ESTA LÍNEA: Agregar data-type como atributo separado
+  if (tile.type) div.setAttribute('data-type', tile.type);
+
+  
   // ESTA ES LA LÍNEA CLAVE: toda la información en un solo atributo
   div.setAttribute('data-tile-info', JSON.stringify(tile));
   
