@@ -39,6 +39,8 @@ function initCraps(
   }
 
   rollButton.addEventListener("click", () => {
+    rollButton.disabled = true;
+    
     let roll1 = parseInt(manualCrap1.value, 10);
     let roll2 = parseInt(manualCrap2.value, 10);
 

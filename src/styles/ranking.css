@@ -1,0 +1,376 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: white;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+}
+
+h2 {
+    background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+    color: white;
+    text-align: center;
+    padding: 30px;
+    margin: 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    letter-spacing: 1px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+}
+
+.table thead {
+    background: linear-gradient(45deg, #2C3E50, #34495E);
+}
+
+.table th {
+    padding: 20px 15px;
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
+    position: relative;
+}
+
+.table th:first-child {
+    border-radius: 0;
+}
+
+.table th:last-child {
+    border-radius: 0;
+}
+
+.table tbody {
+    background: white;
+}
+
+.table tbody tr {
+    transition: all 0.3s ease;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.table tbody tr:hover {
+    background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+    transform: translateX(5px);
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+}
+
+.table tbody tr:nth-child(1) {
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    color: white;
+    font-weight: bold;
+}
+
+.table tbody tr:nth-child(1):hover {
+    background: linear-gradient(45deg, #FFD700, #FF8C00);
+}
+
+.table tbody tr:nth-child(2) {
+    background: linear-gradient(45deg, #C0C0C0, #A0A0A0);
+    color: white;
+    font-weight: bold;
+}
+
+.table tbody tr:nth-child(2):hover {
+    background: linear-gradient(45deg, #C0C0C0, #909090);
+}
+
+.table tbody tr:nth-child(3) {
+    background: linear-gradient(45deg, #CD7F32, #B8860B);
+    color: white;
+    font-weight: bold;
+}
+
+.table tbody tr:nth-child(3):hover {
+    background: linear-gradient(45deg, #CD7F32, #A0791A);
+}
+
+.table td {
+    padding: 18px 15px;
+    text-align: center;
+    font-size: 1.1rem;
+    position: relative;
+}
+
+.table td:first-child {
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.pais-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.flag-emoji {
+    font-size: 1.5rem;
+}
+
+.position-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+    font-weight: bold;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.table tbody tr:nth-child(1) .position-badge {
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    animation: pulse 2s infinite;
+}
+
+.table tbody tr:nth-child(2) .position-badge {
+    background: linear-gradient(45deg, #C0C0C0, #A0A0A0);
+}
+
+.table tbody tr:nth-child(3) .position-badge {
+    background: linear-gradient(45deg, #CD7F32, #B8860B);
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 8px 16px rgba(255, 215, 0, 0.4);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+}
+
+.score {
+    font-weight: bold;
+    font-size: 1.3rem;
+    color: #2C3E50;
+}
+
+.table tbody tr:nth-child(1) .score,
+.table tbody tr:nth-child(2) .score,
+.table tbody tr:nth-child(3) .score {
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.table-striped tbody tr:nth-child(odd) {
+    background-color: rgba(248, 249, 250, 0.5);
+}
+
+.flag-image {
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-right: 8px;
+}
+
+.error-message {
+    text-align: center;
+    color: #e74c3c;
+    font-weight: bold;
+    font-size: 1.1rem;
+    padding: 30px;
+}
+
+/* Responsive Design - Versión mejorada */
+@media (max-width: 768px) {
+    body {
+        padding: 5px;
+        background: white;
+    }
+
+    .container {
+        margin: 5px;
+        border-radius: 12px;
+        max-width: calc(100vw - 10px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    h2 {
+        font-size: 1.5rem;
+        padding: 15px 10px;
+        letter-spacing: 0.5px;
+        background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+    }
+
+    /* Hacer la tabla más compacta */
+    .table {
+        font-size: 0.8rem;
+        margin: 0;
+    }
+
+    .table th {
+        padding: 10px 5px;
+        font-size: 0.7rem;
+        white-space: nowrap;
+    }
+
+    .table td {
+        padding: 8px 5px;
+        font-size: 0.8rem;
+        line-height: 1.2;
+    }
+
+    /* Optimizar columna de país */
+    .table td:first-child {
+        font-size: 0.75rem;
+        font-weight: normal;
+        width: 25%;
+        min-width: 80px;
+    }
+
+    .pais-cell {
+        display: block;
+        text-align: center;
+        gap: 2px;
+    }
+
+    .flag-image {
+        width: 20px;
+        height: auto;
+        display: block;
+        margin: 0 auto 3px auto;
+        border-radius: 2px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Columna jugador más ancha */
+    .table td:nth-child(2) {
+        width: 45%;
+        font-weight: 500;
+    }
+
+    /* Columna puntaje */
+    .table td:nth-child(3) {
+        width: 30%;
+        font-weight: bold;
+    }
+
+    .score {
+        font-size: 0.9rem;
+        font-weight: bold;
+        display: block;
+    }
+
+    /* Mantener colores de medallas en móvil */
+    .table tbody tr:nth-child(1),
+    .table tbody tr:nth-child(2),
+    .table tbody tr:nth-child(3) {
+        color: white;
+        font-weight: bold;
+    }
+
+    .table tbody tr:nth-child(1) .score,
+    .table tbody tr:nth-child(2) .score,
+    .table tbody tr:nth-child(3) .score {
+        color: white;
+        font-size: 1rem;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Reducir efectos hover en móvil */
+    .table tbody tr:hover {
+        transform: translateX(2px);
+        box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1);
+    }
+}
+
+/* Para móviles muy pequeños */
+@media (max-width: 480px) {
+    body {
+        padding: 3px;
+    }
+
+    .container {
+        margin: 3px;
+        border-radius: 8px;
+        max-width: calc(100vw - 6px);
+    }
+
+    h2 {
+        font-size: 1.3rem;
+        padding: 12px 8px;
+        letter-spacing: 0.3px;
+    }
+
+    .table {
+        font-size: 0.7rem;
+    }
+
+    .table th {
+        padding: 8px 3px;
+        font-size: 0.65rem;
+    }
+
+    .table td {
+        padding: 6px 3px;
+        font-size: 0.7rem;
+    }
+
+    .table td:first-child {
+        font-size: 0.65rem;
+        min-width: 70px;
+        width: 25%;
+    }
+
+    .flag-image {
+        width: 18px;
+        margin-bottom: 2px;
+    }
+
+    .score {
+        font-size: 0.8rem;
+    }
+
+    .table tbody tr:nth-child(1) .score,
+    .table tbody tr:nth-child(2) .score,
+    .table tbody tr:nth-child(3) .score {
+        font-size: 0.9rem;
+    }
+}
+
+/* Para pantallas horizontales en móvil */
+@media (max-width: 768px) and (orientation: landscape) {
+    h2 {
+        font-size: 1.4rem;
+        padding: 10px;
+    }
+
+    .table th {
+        padding: 8px 6px;
+    }
+
+    .table td {
+        padding: 6px 6px;
+    }
+}

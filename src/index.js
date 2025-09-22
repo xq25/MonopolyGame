@@ -3,19 +3,23 @@ import { changeSidebar } from './components/SidebarToggle.js'; // Importa la fun
 
 import {loadPlayersInteface, initializePlayersClass} from './components/logicGame.js';
 
+import { cargarRanking } from './components/ranking.js'; // Importa la función para cargar el ranking
+
 const mainContainer = document.getElementById("mainContainer"); // Contenedor principal que incluye sidebar y contenido
 const homeButton = document.getElementById("homeButton"); // boton home del Home
 const rulesButton = document.getElementById("rulesButton"); // boton rules del Home
 const playButton = document.getElementById("playButton"); // boton play del Home
 const content = document.getElementById("content"); // el div donde se quiere cargar el contenido
-
+const rankButton = document.getElementById("rankButton"); // boton rank del Home
 // Cargar el contenido inicial (por defecto cargamos la introduccion del juego)
 function initializeHomePage() {
     loadContent(content); // Carga la introducción del juego por defecto
     //Si se detecta un click en los botones, se carga el contenido correspondiente en el div content
     homeButton.addEventListener("click", () => loadContent(content, "./pages/documentMonopoly.html"));
     rulesButton.addEventListener("click", () => loadContent(content, "./pages/rulesMonopoly.html"));
-   
+    rankButton.addEventListener("click", () => loadContent(content, "./pages/ranking.html").then(() => {
+        cargarRanking();
+    }));
 }
 function initializeSelectPlayers(){
     loadContent(mainContainer, "/src/pages/selectPlayers.html").then(() => {
