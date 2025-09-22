@@ -1,38 +1,40 @@
 /* Estilos principales para el fondo y la organización general de la página */
 body {
-  font-family: Arial, sans-serif;      /* Tipo de letra sencillo y claro */
-  background: #f5f5f5;                 /* Fondo gris claro */
-  display: flex;                       /* Usamos flexbox para centrar el contenido */
-  justify-content: center;             /* Centra horizontalmente */
-  align-items: center;                 /* Centra verticalmente */
-  margin: 0;                           /* Quitamos los márgenes por defecto */
-  height: 100vh;                       /* Ocupa toda la altura de la ventana */
-  overflow: hidden;                    /* Oculta el scroll */
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  min-height: 100vh;           /* Cambiado de height a min-height para mejor responsive */
+  padding: 5px;                /* Añadido padding para evitar que toque los bordes */
+  box-sizing: border-box;      /* Añadido para que el padding no afecte el tamaño */
 }
 
 /* El tablero principal del juego, cuadrado y centrado */
 .board {
-  height: 95vmin;                      /* El tablero es casi tan grande como la ventana */
-  width: 95vmin;
-  display: grid;                       /* Usamos grid para organizar las casillas */
-  grid-template-rows: repeat(11, 1fr); /* 11 filas iguales */
-  grid-template-columns: repeat(11, 1fr); /* 11 columnas iguales */
-  gap: 2px;                            /* Espacio entre casillas */
-  background: #333;                    /* Fondo oscuro para el tablero */
+  height: 90vmin;              /* Reducido ligeramente para mejor visualización */
+  width: 90vmin;
+  display: grid;
+  grid-template-rows: repeat(11, 1fr);
+  grid-template-columns: repeat(11, 1fr);
+  gap: 2px;
+  background: #333;
   box-sizing: border-box;
-  padding: 5px;                        /* Espacio interno */
-  box-shadow: 2px solid #333;          /* Borde oscuro */
+  padding: 5px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.5);   /* Corregido el box-shadow */
 }
 
 /* Cada casilla del tablero */
 .square {
-  background: white;                   /* Fondo blanco */
-  border: 1px solid #999;              /* Borde gris */
-  font-size: 9px;                      /* Texto pequeño */
-  text-align: center;                  /* Centra el texto */
-  display: flex;                       /* Flex para organizar el contenido verticalmente */
+  background: white;
+  border: 1px solid #999;
+  font-size: 9px;
+  text-align: center;
+  display: flex;
   flex-direction: column;
   justify-content: space-between;
+  overflow: hidden;            /* Evitar desbordamiento de texto */
 }
 
 /* Barra de color en algunas casillas */
@@ -43,12 +45,12 @@ body {
 
 /* Zona central del tablero */
 #center {
-  grid-row: 2 / 11;                    /* Ocupa el centro del tablero */
+  grid-row: 2 / 11;
   grid-column: 2 / 11;
   display: grid;
   grid-template-rows: 1fr 2fr 1fr;
   grid-template-columns: 1fr 1fr 1fr;
-  background: #f5f5f5;                 /* Fondo igual al de la página */
+  background: #f5f5f5;
   align-items: center;
   justify-items: center;
 }
@@ -63,18 +65,18 @@ body {
   align-items: center;
   justify-content: center;
   font-weight: bold; 
-  border-radius: 20px;                 /* Esquinas redondeadas */
-  margin: 10px ;
+  border-radius: 20px;
+  margin: 10px;
 }
 
-/* Posición de la carta de comunidad (arriba al centro) */
+/* Posición de la carta de comunidad */
 #cajaComunidad {
   grid-row: 1;
   grid-column: 2;
   background-color: lightblue;
 }
 
-/* Posición de la carta de suerte (abajo al centro) */
+/* Posición de la carta de suerte */
 #cajaSuerte {
   grid-row: 3;
   grid-column: 2;
@@ -93,41 +95,70 @@ body {
 /* Cambios para cuando se ve en celulares o pantallas pequeñas */
 @media (max-width: 600px) {
   .board {
-    width: 98vw;                       /* El tablero ocupa casi todo el ancho de la pantalla */
-    height: 98vw;
+    width: 95vmin;                /* Usa vmin en lugar de vw para mantener proporciones */
+    height: 95vmin;
     min-width: 320px;
     min-height: 320px;
     padding: 2px;
+    gap: 1px;                     /* Reduce el espacio entre casillas */
   }
+  
+  .square {
+    font-size: 7px;               /* Texto un poco más pequeño */
+  }
+  
   #center {
     grid-row: 2 / 11;
     grid-column: 2 / 11;
-    font-size: 12px;                   /* Texto un poco más grande */
+    font-size: 12px;
   }
+  
   .carta {
-    width: 70px;                       /* Cartas más pequeñas */
+    width: 70px;
     height: 100px;
     font-size: 12px;
     margin: 5px;
+    border-radius: 10px;          /* Bordes menos redondeados */
   }
+  
   #logo {
-    width: 120px;                      /* Logo más pequeño */
+    width: 120px;
     height: 60px;
     background-size: contain;
   }
-  body {
-    overflow: auto;                    /* Permite hacer scroll si es necesario */
-    align-items: flex-start;            /* El contenido empieza desde arriba */
-    padding: 10px 0;
+}
+
+/* Media query adicional para pantallas muy pequeñas */
+@media (max-width: 375px) {
+  .board {
+    width: 98vmin;
+    height: 98vmin;
+    gap: 1px;
+  }
+  
+  .square {
+    font-size: 5px;               /* Texto aún más pequeño */
+  }
+  
+  .carta {
+    width: 50px;
+    height: 75px;
+  }
+  
+  #logo {
+    width: 90px;
+    height: 45px;
   }
 }
+
+/* Dejado exactamente igual como pediste */
 .token {
-  width: 50%;              /* la mitad del ancho de la casilla */
-  height: 50%;             /* la mitad del alto de la casilla */
-  border-radius: 50%;      /* lo convierte en círculo */
-  margin: auto;            /* centrado dentro de la casilla */
-  border: 2px solid #333;  /* un borde oscuro para resaltar */
-  box-shadow: 0 2px 5px rgba(0,0,0,0.3); /* un poco de sombra para dar volumen */
+  width: 50%;
+  height: 50%;
+  border-radius: 50%;
+  margin: auto;
+  border: 2px solid #333;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
 }
 
 /* Colores de cada jugador */
@@ -143,6 +174,3 @@ body {
 #token-green {
   background-color: green;
 }
-
-
-

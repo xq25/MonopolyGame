@@ -8,40 +8,11 @@ function makeSquare(tile) { //creamos las casillas
   //Agregamos todo esto al html:SQUAREEEE
   //no es necesario hacer una funcion ya que desde aca se la podemos asignar(mucho mas rapido jaja)
   if (tile.id !== undefined) { // si la casilla tiene id
-    div.id = tile.id; // se lo asignamos al div
+    div.id = `square-${tile.id}`; // se lo asignamos al div
   }
-   // Guardamos el tipo de casilla como atributo
-  if (tile.type) { //si la casilla tiene tipo, se lo asignamos como atributo data-type
-    div.setAttribute('data-type', tile.type);    
-  }
-
-  // Añadir datos específicos según el tipo
-  if (tile.type === 'property') {
-    // Datos básicos de propiedades (usados frecuentemente)
-    if (tile.price) div.setAttribute('data-price', tile.price);
-    if (tile.color) div.setAttribute('data-color', tile.color);
-    if (tile.mortgage) div.setAttribute('data-mortgage', tile.mortgage);
-    
-    // Para rentas como JSON string
-    if (tile.rent) {
-      const rentJSON = JSON.stringify(tile.rent);
-      div.setAttribute('data-rent', rentJSON);
-    }
-  } 
-  else if (tile.type === 'special') {
-    // Para casillas especiales como Salida, Cárcel, etc.
-    if (tile.action && tile.action.money) {
-      div.setAttribute('data-money-action', tile.action.money);
-    }
-  }
-  else if (tile.type === 'tax') {
-    // Para impuestos
-    if (tile.amount) div.setAttribute('data-amount', tile.amount);
-  }
-  else if (tile.type === 'railroad') {
-    if (tile.price) div.setAttribute('data-price', tile.price);
-  }
-
+  // ESTA ES LA LÍNEA CLAVE: toda la información en un solo atributo
+  div.setAttribute('data-tile-info', JSON.stringify(tile));
+  
   if (tile.color) {
     const color = document.createElement("div");// si tiene color, creamos un div para el color y se lo colocamos arriba
     color.className = "color-bar";// le asignamos la clase
