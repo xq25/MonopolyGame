@@ -155,16 +155,8 @@ export function eventBox(numDice, currentPlayer, allPlayers) {
   if (window.MONOPOLY && window.MONOPOLY.squares && window.MONOPOLY.squares[numDice]) {
     // Si existe el objeto global MONOPOLY con datos
     squareData = window.MONOPOLY.squares[numDice];
-  } else if (boardData) {
-    // Buscar en los datos del tablero cargados
-    ['bottom', 'left', 'top', 'right'].forEach(section => {
-      if (boardData[section]) {
-        const found = boardData[section].find(tile => tile.id && tile.id.toString() === numDice);
-        if (found) squareData = found;
-      }
-    });
-  }
-
+  } else if (boardData) 
+    
   // 1. CASILLAS TIPO PROPIEDAD
   if (tipo === 'property') {
     // Obtener datos básicos de la propiedad
