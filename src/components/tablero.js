@@ -9,7 +9,7 @@ function makeSquare(tile) { //creamos las casillas
   //Agregamos todo esto al html:SQUAREEEE
   //no es necesario hacer una funcion ya que desde aca se la podemos asignar(mucho mas rapido jaja)
   if (tile.id) { // si la casilla tiene id
-    div.id = tile.id; // se lo asignamos al div
+    div.id = `square-${tile.id}`; // se lo asignamos al div
   }
    // Guardamos el tipo de casilla como atributo
   if (tile.type) { //si la casilla tiene tipo, se lo asignamos como atributo data-type
@@ -19,7 +19,6 @@ function makeSquare(tile) { //creamos las casillas
   // if (tile.name){
   //   div.setName('data-name', tile.name)
   // }
-
 
   if (tile.color) {
     const color = document.createElement("div");// si tiene color, creamos un div para el color y se lo colocamos arriba
