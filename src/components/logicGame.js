@@ -13,13 +13,18 @@ export function setBoardData(data) {
 }
 
 export function playGame(infoPlayers, tablero){
+  const popup = result?.closest('.crap-section') || result?.parentElement;
   let endGame = false;
   let turn = 0;
   const maxTurn = infoPlayers.length;
-
+  
   initCraps();
+  if(popup){ popup.style.display = "block"; }
   document.addEventListener('diceRolled', (e) => { //Cada que se tiran los dados es porque se cambia el turno.
     const numDice = e.detail;
+    setTimeout(() => {
+      if(popup) popup.style.display = "none";
+    }, 1000);
     if (infoPlayers[turn].active){
       changePositionPlayer(numDice, infoPlayers[turn], tablero);
       // Aquí puedes avanzar el turno, mostrar mensajes, etc.
@@ -27,12 +32,15 @@ export function playGame(infoPlayers, tablero){
       //Funciones Dany
 
       //Manejo de los turnos
+      
       if (turn === maxTurn-1){
         turn = 0;
       }else{
         turn ++;
       }
-      
+    setTimeout(() => {
+      if(popup) popup.style.display = "block"
+    }, 2000);
     } else {
         // Acciones para que el usuario esté otra vez activo
     }
