@@ -13,13 +13,18 @@ export function setBoardData(data) {
 }
 
 export function playGame(infoPlayers, tablero){
+  const popup = result?.closest('.crap-section') || result?.parentElement;
   let endGame = false;
   let turn = 0;
   const maxTurn = infoPlayers.length;
 
   initCraps();
+  if(popup){ popup.style.display = "block"; }
   document.addEventListener('diceRolled', (e) => {
   const numDice = e.detail;
+  setTimeout(() => {
+      if(popup) popup.style.display = "none";
+    }, 1500);
   if (infoPlayers[turn].active){
     changePositionPlayer(numDice, infoPlayers[turn], tablero);
 
@@ -34,8 +39,12 @@ export function playGame(infoPlayers, tablero){
       } else {
         turn++;
       }
-    }, 100); // 100 ms suele ser suficiente
-  } else {
+    }, 100); 
+    setTimeout(() => {
+      if(popup) popup.style.display = "block";
+    }, 3000);
+  } 
+  else {
     // Acciones para que el usuario esté otra vez activo
   }
 }); 
