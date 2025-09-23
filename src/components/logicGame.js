@@ -57,6 +57,7 @@ export function changePositionPlayer(numDados, infoPlayer, tablero){
 
     // Elimina el token anterior si existe
     const oldToken = tablero.querySelector(`#token-${infoPlayer.color}`);
+    console.log(oldToken)
     if (oldToken){
         oldToken.remove();
     }

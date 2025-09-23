@@ -54,7 +54,6 @@ document.addEventListener("DOMContentLoaded", () => {
             objectList.forEach(player => {
                 loadPlayerInteface(player);
             });
-            changePositionPlayer(6, objectList[0], tablero);
         });
         //Aqui hay que hacer otra funcion en la cual despues de cargar el tablero se carguen el resto de los elementos e inicie el juego
     }, { once: true }); //Esto nos indica que solo va a escuchar este evento una unica vez. Ya que solo despues de que la info en los formularios este bien, se iniciara el juego.
