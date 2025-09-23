@@ -1,6 +1,3 @@
-import { initCraps } from "./craps.js";
-
-const board = document.getElementById("board");
 export let boardData = {}; // Variable global exportada
 const url = "http://127.0.0.1:5000/board";
 
@@ -17,7 +14,6 @@ function makeSquare(tile) { //creamos las casillas
   // AÑADE ESTA LÍNEA: Agregar data-type como atributo separado
   if (tile.type) div.setAttribute('data-type', tile.type);
 
-  
   // ESTA ES LA LÍNEA CLAVE: toda la información en un solo atributo
   div.setAttribute('data-tile-info', JSON.stringify(tile));
   
@@ -26,6 +22,14 @@ function makeSquare(tile) { //creamos las casillas
     color.className = "color-bar";// le asignamos la clase
     color.style.background = tile.color;// le asignamos a la casilla el color que le corresponde(si tiene)
     div.appendChild(color);
+  }
+
+  // Estado de la propiedad (nuevo)
+  if (tile.type === "property" || tile.type === "railroad") {
+    const stateDiv = document.createElement("div");
+    stateDiv.className = "property-state";
+    stateDiv.textContent = ""; // Por defecto
+    div.appendChild(stateDiv);
   }
 
   const name = document.createElement("div");
@@ -86,7 +90,7 @@ fetch(url)
         }
       });
     });
-    initCraps();
+
     //debemos colocar el evento de tablero ready para que se coloquen justo despues que las casillas se ccreen en el DOM
     
     // Pasar los datos a logicGame.js

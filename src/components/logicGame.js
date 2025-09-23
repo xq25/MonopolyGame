@@ -14,86 +14,23 @@ export function setBoardData(data) {
 function playGame(infoPlayers){
     let endGame = false;
     let turn = 0;
-    const maxTurn = infoPlayers.length; //Almacenamos la cantidad de players que se tienen dentro del juego para poder manejar los turnos.
+    const maxTurn = infoPlayers.length;
 
-    //Estructura basica del juego
     while (!endGame){
         if (infoPlayers[turn].active){
-            //funcion de mostrar los dados y tirarlos
-            // funcionTirarDados().then(numDice => { changePosition (numeDice, info) })
-
-            // Funcion para mover al player
-            // changePositionPlayer(numDice, infoPlayers[turn], dashboard);
-
-            // let action = {} // Acciones despues de caer sobre una casilla, este metodo debe devolver un objeto con el emetodo a realizar y el valor de agregacion o eliminacion sobre ciertos atributos de las clases.
+            // Código para lanzar dados y mover jugador
+            
             // Obtener acciones de la casilla donde cayó
             const action = eventBox(infoPlayers[turn].position.toString(), infoPlayers[turn], infoPlayers);
-
-            if (Object.keys(action).length !== 0){ // Esto nos indica que la funcion si nos devolvio instrucciones de cambio para atributos de las clases.
-                // Modificar el atributo correspondiente.
-
-                // Funcion de cargar nuevamente la informacion del player.
-                switch(action.actionType) {
-                case 'buy-property':
-                case 'buy-railroad':
-                case 'buy-utility':
-              // Preguntar si quiere comprar
-              const wantToBuy = confirm(`¿Quieres comprar ${action.name} por $${action.price}?`);
-            if (wantToBuy && infoPlayers[turn].getMoney() >= action.price) {
-              infoPlayers[turn].setMoney(infoPlayers[turn].getMoney() - action.price);
-                // Registrar propiedad como comprada
-              propertyOwners[action.propertyId || action.railroadId || action.utilityId] = infoPlayers[turn].getNickName();
-              alert(`¡Has comprado ${action.name}!`);
-            }
-              break;
-      
-            case 'pay-rent':
-            case 'pay-railroad-rent':
-            case 'pay-utility-rent':
-            const owner = infoPlayers.find(p => p.getNickName() === action.ownerId);
-            if (owner) {
-              infoPlayers[turn].setMoney(infoPlayers[turn].getMoney() - action.rent);
-              owner.setMoney(owner.getMoney() + action.rent);
-              alert(`Pagas $${action.rent} de renta a ${action.ownerId} por ${action.name}`);
-            }
-            break;
-      
-          case 'community-card':
-          case 'chance-card':
-          alert(`${action.description}`);
-          if (action.money !== 0) {
-            infoPlayers[turn].setMoney(infoPlayers[turn].getMoney() + action.money);
-          }
-          break;
-      
-          case 'go-to-jail':
-          infoPlayers[turn].position = action.destination;
-          alert("¡Vas a la cárcel!");
-          // Aquí podrías agregar lógica para manejar el estado de la cárcel
-          //infoPlayers[turn].active = false; // Ejemplo: el jugador pierde su próximo turno
-          break;
-      
-          case 'pay-tax':
-          infoPlayers[turn].setMoney(infoPlayers[turn].getMoney() - action.amount);
-          alert(`Pagas $${action.amount} de ${action.name}`);
-          break;
-        }
-  
-  // Actualizar interfaz después de la acción
-  loadPlayerInteface(infoPlayers[turn]);
-                // loadPlayersInteface(infoPlayers[turn])
-            }
             
+            // Procesar la acción (esto reemplaza todo el switch-case anterior)
+            processAction(action, infoPlayers, turn);
         }
-        else{
-            //Acciones posibles para volver a estar activo
-            // Si funciona modificar al player correspondiente.
-            
-            //Cargamos nuevamente la informacion del player 
-            // loadPlayersInteface(infoPlayers[turn])
-
+        else {
+            // Acciones para jugadores inactivos
         }
-        turn ++;
+        
+        turn++;
         if (turn === maxTurn){
             turn = 0;
         }
@@ -410,4 +347,85 @@ function endGameBrokeCondition(infoPlayers){
         }
 
         return endGameCondition;
+}
+/**
+ * Procesa una acción generada por eventBox
+ * @param {Object} action - La acción devuelta por eventBox
+ * @param {Array} infoPlayers - Lista de jugadores
+ * @param {number} turn - Índice del jugador actual
+ */
+function processAction(action, infoPlayers, turn) {
+  // Si no hay acción (objeto vacío) no hacemos nada
+  if (!action || Object.keys(action).length === 0) {
+    return;
+  }
+  
+  // Procesamos según el tipo de acción
+  switch(action.actionType) {
+    // COMPRAR PROPIEDADES
+    case 'buy-property':
+    case 'buy-railroad':
+    case 'buy-utility':
+      // Preguntar si quiere comprar
+      const wantToBuy = confirm(`¿Quieres comprar ${action.name} por $${action.price}?`);
+      if (wantToBuy && infoPlayers[turn].getMoney() >= action.price) {
+        // Restar dinero
+        infoPlayers[turn].setMoney(infoPlayers[turn].getMoney() - action.price);
+        //pintar la casilla del color del jugador
+        
+        // Registrar propiedad como comprada
+        propertyOwners[action.propertyId || action.railroadId || action.utilityId] = infoPlayers[turn].getNickName();
+        // Agregar a la lista de propiedades del jugador (si no existe la creamos)
+        if (!infoPlayers[turn].propierties) {
+          infoPlayers[turn].propierties = [];
+        }
+        infoPlayers[turn].propierties.push(action.propertyId || action.railroadId || action.utilityId);
+        alert(`¡Has comprado ${action.name}!`);
+      }
+      break;
+    
+    // PAGAR RENTA
+    case 'pay-rent':
+    case 'pay-railroad-rent':
+    case 'pay-utility-rent':
+      // Encontrar al dueño
+      const owner = infoPlayers.find(p => p.getNickName() === action.ownerId);
+      if (owner) {
+        // Transferir dinero
+        infoPlayers[turn].setMoney(infoPlayers[turn].getMoney() - action.rent);
+        owner.setMoney(owner.getMoney() + action.rent);
+        alert(`Pagas $${action.rent} de renta a ${action.ownerId} por ${action.name}`);
+      }
+      break;
+    
+    // CARTAS
+    case 'community-card':
+    case 'chance-card':
+      alert(`${action.description}`);
+      if (action.money !== 0) {
+        // Modificar dinero según la carta
+        infoPlayers[turn].setMoney(infoPlayers[turn].getMoney() + action.money);
+        if (action.money > 0) {
+          alert(`Recibes $${action.money}`);
+        } else {
+          alert(`Pagas $${Math.abs(action.money)}`);
+        }
+      }
+      break;
+    
+    // IR A LA CÁRCEL
+    case 'go-to-jail':
+      infoPlayers[turn].position = action.destination;
+      alert("¡Vas a la cárcel!");
+      break;
+    
+    // PAGAR IMPUESTO
+    case 'pay-tax':
+      infoPlayers[turn].setMoney(infoPlayers[turn].getMoney() - action.amount);
+      alert(`Pagas $${action.amount} de ${action.name}`);
+      break;
+  }
+  
+  // Actualizar interfaz después de la acción
+  loadPlayerInteface(infoPlayers[turn]);
 }
