@@ -1,4 +1,5 @@
 import { Player } from '../model/players.js'
+import {initCraps} from '../components/craps.js'
 // Estructura para guardar los dueños de propiedades
 const propertyOwners = {}; // { 'idPropiedad': 'nombreJugador' }
 const endButton = document.getElementById('endGameBtn')//Boton para finalizar el juego manualmente
@@ -12,94 +13,34 @@ export function setBoardData(data) {
 }
 
 export function playGame(infoPlayers, tablero){
-    let endGame = false;
-    let turn = 0;
-    const maxTurn = infoPlayers.length; //Almacenamos la cantidad de players que se tienen dentro del juego para poder manejar los turnos.
+  let endGame = false;
+  let turn = 0;
+  const maxTurn = infoPlayers.length;
 
-    //Estructura basica del juego
-    while (!endGame){
-        if (infoPlayers[turn].active){
-            //funcion de mostrar los dados y tirarlos
-            // funcionTirarDados().then(numDice => { changePosition (numeDice, info) })
-
-            // Funcion para mover al player
-            // changePositionPlayer(numDice, infoPlayers[turn], dashboard);
-
-            // let action = {} // Acciones despues de caer sobre una casilla, este metodo debe devolver un objeto con el emetodo a realizar y el valor de agregacion o eliminacion sobre ciertos atributos de las clases.
-            // Obtener acciones de la casilla donde cayó
-            const action = eventBox(infoPlayers[turn].position.toString(), infoPlayers[turn], infoPlayers);
-
-            if (Object.keys(action).length !== 0){ // Esto nos indica que la funcion si nos devolvio instrucciones de cambio para atributos de las clases.
-                // Modificar el atributo correspondiente.
-
-                // Funcion de cargar nuevamente la informacion del player.
-                switch(action.actionType) {
-                case 'buy-property':
-                case 'buy-railroad':
-                case 'buy-utility':
-              // Preguntar si quiere comprar
-              const wantToBuy = confirm(`¿Quieres comprar ${action.name} por $${action.price}?`);
-            if (wantToBuy && infoPlayers[turn].getMoney() >= action.price) {
-              infoPlayers[turn].setMoney(infoPlayers[turn].getMoney() - action.price);
-                // Registrar propiedad como comprada
-              propertyOwners[action.propertyId || action.railroadId || action.utilityId] = infoPlayers[turn].getNickName();
-              alert(`¡Has comprado ${action.name}!`);
-            }
-              break;
+  initCraps();
+  document.addEventListener('diceRolled', (e) => { //Cada que se tiran los dados es porque se cambia el turno.
+    const numDice = e.detail;
+    if (infoPlayers[turn].active){
+      changePositionPlayer(numDice, infoPlayers[turn], tablero);
+      // Aquí puedes avanzar el turno, mostrar mensajes, etc.
       
-            case 'pay-rent':
-            case 'pay-railroad-rent':
-            case 'pay-utility-rent':
-            const owner = infoPlayers.find(p => p.getNickName() === action.ownerId);
-            if (owner) {
-              infoPlayers[turn].setMoney(infoPlayers[turn].getMoney() - action.rent);
-              owner.setMoney(owner.getMoney() + action.rent);
-              alert(`Pagas $${action.rent} de renta a ${action.ownerId} por ${action.name}`);
-            }
-            break;
-      
-          case 'community-card':
-          case 'chance-card':
-          alert(`${action.description}`);
-          if (action.money !== 0) {
-            infoPlayers[turn].setMoney(infoPlayers[turn].getMoney() + action.money);
-          }
-          break;
-      
-          case 'go-to-jail':
-          infoPlayers[turn].position = action.destination;
-          alert("¡Vas a la cárcel!");
-          // Aquí podrías agregar lógica para manejar el estado de la cárcel
-          //infoPlayers[turn].active = false; // Ejemplo: el jugador pierde su próximo turno
-          break;
-      
-          case 'pay-tax':
-          infoPlayers[turn].setMoney(infoPlayers[turn].getMoney() - action.amount);
-          alert(`Pagas $${action.amount} de ${action.name}`);
-          break;
-        }
-  
-  // Actualizar interfaz después de la acción
-  loadPlayerInteface(infoPlayers[turn]);
-                // loadPlayersInteface(infoPlayers[turn])
-            }
-            
-        }
-        else{
-            //Acciones posibles para volver a estar activo
-            // Si funciona modificar al player correspondiente.
-            
-            //Cargamos nuevamente la informacion del player 
-            // loadPlayersInteface(infoPlayers[turn])
+      //Funciones Dany
 
-        }
+      //Manejo de los turnos
+      if (turn === maxTurn-1){
+        turn = 0;
+      }else{
         turn ++;
-        if (turn === maxTurn){
-            turn = 0;
-        }
+      }
+      
+    } else {
+        // Acciones para que el usuario esté otra vez activo
     }
+    
+  });  
 }
-export function changePositionPlayer(numDados, infoPlayer, tablero){
+
+function changePositionPlayer(numDados, infoPlayer, tablero){
     // Calcula la nueva posición del jugador
     let posPlayer = infoPlayer.position + numDados;
     if (posPlayer > 40){
@@ -110,7 +51,6 @@ export function changePositionPlayer(numDados, infoPlayer, tablero){
 
     // Busca la casilla correspondiente usando el id generado en tablero.js
     const targetSquare = document.getElementById(`square-${posPlayer}`)
-    console.log(targetSquare)
     if (!targetSquare) {
         console.error(`No existe la casilla con id="square-${posPlayer}" en el tablero.`);
         return;
@@ -131,7 +71,7 @@ export function changePositionPlayer(numDados, infoPlayer, tablero){
 }
 
 // Función principal que determina qué acción realizar según la casilla
-export function eventBox(numDice, currentPlayer, allPlayers) {
+function eventBox(numDice, currentPlayer, allPlayers) {
   // Buscar la casilla en el DOM
   const casilla = document.getElementById(`square-${numDice}`);// el id del html 
   if (!casilla) {
@@ -359,7 +299,6 @@ export function eventBox(numDice, currentPlayer, allPlayers) {
   return {}; // Devuelve un objeto vacío - no hay acción
 }
 
-
 //Esta funcion nos permite inicializar como objetos la informacion de los usuarios que tenemos.
 export function initializePlayersClass(playersList){
     let objectClassList = [];
@@ -369,6 +308,7 @@ export function initializePlayersClass(playersList){
     });
     return objectClassList;
 }
+
 //Esta funcion nos permite cargar la informacion de cada jugador. Vamos a reutilizarla al detectar cambios a medida que pasa el juego.
 export function loadPlayerInteface(objectPlayer){
 
@@ -395,6 +335,7 @@ export function loadPlayerInteface(objectPlayer){
         gameDiv.appendChild(divInfoPlayer); //Agregamos cada recuadro a nuestra visualizacion del juego.
     }
 }
+
 function endGameBrokeCondition(infoPlayers){
 
         const playersBroke = [];
