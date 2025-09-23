@@ -1,65 +1,78 @@
-#player-red {
+.playerInterface{
   padding: 15px;
   position: fixed;
-  top: 0;
-  left: 0;
   margin: 10px;
+  width: 15%;
   z-index: 1000;
-  width: 25%;
-  background-color: rgba(255, 0, 0, 0.423); /* Color más suave */
   border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(255, 0, 0, 0.2); /* Sombra */
   backdrop-filter: blur(6px); /* Efecto vidrio */
   color: #fff; /* Texto claro */
   font-family: Arial, sans-serif;
 }
+.playerInterface h2 {
+  display: flex;                /* ya lo usas */
+  align-items: center;
+  gap: 10px;
+
+  /* 🔹 Ajustes clave */
+  overflow: hidden;             /* Oculta el exceso */
+  text-overflow: ellipsis;      /* Puntos suspensivos */
+  white-space: nowrap;          /* Que no se parta en varias líneas */
+}
+
+/* Contenido visible por defecto */
+.player-content {
+  max-height: 500px;           /* suficiente para que entre todo */
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+  opacity: 1;
+}
+
+/* Cuando esté colapsado */
+.player-content.collapsed {
+  max-height: 0;
+  opacity: 0;
+  padding: 0;                  /* opcional para que se comprima */
+}
+
+.player-header {
+  cursor: pointer;
+  user-select: none;
+}
+
+
+.player-content.collapsed + .player-header::after,
+.player-header.collapsed::after {
+  transform: rotate(-90deg);
+}
+
+
+#player-red {
+  top: 0;
+  left: 0;
+  background-color: rgba(255, 0, 0, 0.423); /* Color más suave */
+  box-shadow: 0 4px 8px rgba(255, 0, 0, 0.2); /* Sombra */
+}
 
 #player-blue {
-  padding: 15px;
-  position: fixed;
   top: 0;
   right: 0;
-  margin: 10px;
-  z-index: 1000;
-  width: 25%;
   background-color: rgba(0, 0, 255, 0.351);
-  border-radius: 12px;
   box-shadow: 0 4px 8px rgba(0, 229, 255, 0.2);
-  backdrop-filter: blur(6px);
-  color: #fff;
-  font-family: Arial, sans-serif;
 }
 
 #player-yellow {
-  padding: 15px;
-  position: fixed;
   bottom: 0;
   left: 0;
-  margin: 10px;
-  z-index: 1000;
-  width: 25%;
   background-color: rgba(255, 255, 0, 0.381);
-  border-radius: 12px;
   box-shadow: 0 4px 8px rgba(254, 254, 0, 0.2);
-  backdrop-filter: blur(6px);
-  color: #333; /* Texto oscuro para fondo claro */
-  font-family: Arial, sans-serif;
 }
 
 #player-green {
-  padding: 15px;
-  position: fixed;
   bottom: 0;
   right: 0;
-  margin: 10px;
-  z-index: 1000;
-  width: 25%;
   background-color: rgba(0, 128, 0, 0.422);
-  border-radius: 12px;
   box-shadow: 0 4px 8px rgba(2, 243, 34, 0.2);
-  backdrop-filter: blur(6px);
-  color: #fff;
-  font-family: Arial, sans-serif;
 }
 /* --- TITULO Y BANDERA --- */
 #player-red h2,
@@ -149,6 +162,28 @@
   box-shadow: 0 6px 12px rgba(0,0,0,0.3);
   transform: scale(1.02);
   transition: all 0.3s ease;
+}
+
+.playerInterface .properties-select {
+  width: 100%;
+  padding: 5px 8px;
+  font-size: 0.9rem;
+  border-radius: 6px;
+  border: none;
+  background-color: rgba(255,255,255,0.1);
+  color: #fff;
+  outline: none;
+  margin-bottom: 10px;
+}
+
+/* Para cambiar el color de las opciones */
+.playerInterface .properties-select option {
+  color: #000; /* texto negro dentro del desplegable */
+}
+@media(min-width: 992px){
+  .playerInterface{
+    width: 25%;
+  }
 }
 .board{
     position: relative;

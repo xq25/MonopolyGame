@@ -41,33 +41,33 @@ export function playGame(infoPlayers, tablero){
 }
 
 function changePositionPlayer(numDados, infoPlayer, tablero){
-    // Calcula la nueva posición del jugador
-    let posPlayer = infoPlayer.position + numDados;
-    if (posPlayer > 40){
-        posPlayer -= 40;
-    } 
+  // Calcula la nueva posición del jugador
+  let posPlayer = infoPlayer.position + numDados;
+  if (posPlayer >= 40){
+    posPlayer -= 40;
+  } 
 
-    infoPlayer.position = posPlayer;
+  infoPlayer.position = posPlayer;
 
-    // Busca la casilla correspondiente usando el id generado en tablero.js
-    const targetSquare = document.getElementById(`square-${posPlayer}`)
-    if (!targetSquare) {
-        console.error(`No existe la casilla con id="square-${posPlayer}" en el tablero.`);
-        return;
-    }
+  // Busca la casilla correspondiente usando el id generado en tablero.js
+  const targetSquare = document.getElementById(`square-${posPlayer}`)
+  if (!targetSquare) {
+      console.error(`No existe la casilla con id="square-${posPlayer}" en el tablero.`);
+      return;
+  }
 
-    // Elimina el token anterior si existe
-    const oldToken = tablero.querySelector(`#token-${infoPlayer.color}`);
-    console.log(oldToken)
-    if (oldToken){
-        oldToken.remove();
-    }
+  // Elimina el token anterior si existe
+  const oldToken = tablero.querySelector(`#token-${infoPlayer.color}`);
+  console.log(oldToken)
+  if (oldToken){
+      oldToken.remove();
+  }
 
-    // Crea y agrega el nuevo token
-    const tokenPlayer = document.createElement('div');
-    tokenPlayer.classList.add('token');
-    tokenPlayer.id = `token-${infoPlayer.color}`;
-    targetSquare.appendChild(tokenPlayer);
+  // Crea y agrega el nuevo token
+  const tokenPlayer = document.createElement('div');
+  tokenPlayer.classList.add('token');
+  tokenPlayer.id = `token-${infoPlayer.color}`;
+  targetSquare.appendChild(tokenPlayer);
 }
 
 // Función principal que determina qué acción realizar según la casilla
@@ -301,54 +301,85 @@ function eventBox(numDice, currentPlayer, allPlayers) {
 
 //Esta funcion nos permite inicializar como objetos la informacion de los usuarios que tenemos.
 export function initializePlayersClass(playersList){
-    let objectClassList = [];
+  let objectClassList = [];
 
-    objectClassList = playersList.map(item => { //La funcion map nos permite acceder a cada elemento de una lista para rellenar otra, pero si o si por cada item debe haber un return.
-        return new Player(item.nickName, item.country, item.color ) //Creamos la instancia de cada player.
-    });
-    return objectClassList;
+  objectClassList = playersList.map(item => { //La funcion map nos permite acceder a cada elemento de una lista para rellenar otra, pero si o si por cada item debe haber un return.
+    return new Player(item.nickName, item.country, item.color ) //Creamos la instancia de cada player.
+  });
+  return objectClassList;
 }
 
 //Esta funcion nos permite cargar la informacion de cada jugador. Vamos a reutilizarla al detectar cambios a medida que pasa el juego.
 export function loadPlayerInteface(objectPlayer){
 
-    if (objectPlayer){
+  if (objectPlayer){
 
-        const gameDiv = document.getElementById('gameDiv');
-        
-        let divInfoPlayer = document.createElement('div');
-        divInfoPlayer.id = `player-${objectPlayer.color}`; //Asignamos el id correspondiente a cada jugar. Esta clase es la que indicara su posicion en la pantalla y las diferencias de colores.
-        divInfoPlayer.classList.add('playerInterface'); //Esta es la clase general que genera el recuadro con el mismo tamaño para todos.
-        divInfoPlayer.innerHTML = `
-            <h2><img src="https://flagsapi.com/${objectPlayer.country.toUpperCase()}/flat/64.png" alt="Bandera-${objectPlayer.country}" class="flag">${objectPlayer.nick_name}</h2>
-            <p class="money-text"><strong>Dinero disponible:</strong> ${objectPlayer.money}</p>
-            <p class= "properties-text">Propiedades adquiridas:</p>
-            <ul>
-                
-            </ul>
+    const gameDiv = document.getElementById('gameDiv');
+    
+    let divInfoPlayer = document.createElement('div');
+    // Construimos las options del select a partir de objectPlayer.propierties
+    //Cada prop es el id de la propiedad
+    const optionsPropierties = objectPlayer.propierties && objectPlayer.propierties.length > 0? objectPlayer.propierties.map(prop => `<option value="${prop}">${getInfoElementHtml(prop).name}</option>`).join(""): `<option disabled>No hay propiedades</option>`;
+    const optionsMortgages = objectPlayer.mortgages && objectPlayer.mortgages.length > 0? objectPlayer.mortgages.map(mort => `<option value="${mort}">${getInfoElementHtml(mort)}</option>`).join(""): `<option disabled>No hay Hipotecas</option>`;
+    // const optionLoans = objectPlayer.loans && objectPlayer.loans.length > 0? //Implementar la logica de loss prestamo
+      
+    divInfoPlayer.id = `player-${objectPlayer.color}`; //Asignamos el id correspondiente a cada jugar. Esta clase es la que indicara su posicion en la pantalla y las diferencias de colores.
+    divInfoPlayer.classList.add('playerInterface'); //Esta es la clase general que genera el recuadro con el mismo tamaño para todos.
+    divInfoPlayer.innerHTML = `
+      <h2 class="player-header">
+        <img src="https://flagsapi.com/${objectPlayer.country.toUpperCase()}/flat/64.png" 
+             alt="Bandera-${objectPlayer.country}" 
+             class="flag">
+        ${objectPlayer.nick_name}
+      </h2>
+      <div class="player-content">
+        <p class="money-text"><strong>Dinero :</strong> $${objectPlayer.money}</p>
+        <select class="properties-select">
+          <option value="" selected hidden>Propiedades</option>
+          ${optionsPropierties}
+        </select>
+        <select class="properties-select">
+          <option value="" selected hidden>Hipotecas</option>
+          ${optionsMortgages}
+        </select>
+        <select class="properties-select">
+          <option value="" selected hidden>prestamos</option>
+          ${optionsMortgages}
+        </select>
+      </div>
+    `;
+    gameDiv.appendChild(divInfoPlayer); //Agregamos cada recuadro a nuestra visualizacion del juego.
 
-            <p class="h&p-text">Hipotecas y préstamos activos:</p>
-            <ul>
-            
-            </ul>
-        `;
-        gameDiv.appendChild(divInfoPlayer); //Agregamos cada recuadro a nuestra visualizacion del juego.
-    }
+    //Sacamos loss elementos que necesitamos para poder aplicar la logica de desplegar y esconder la interfaz.
+    const header = divInfoPlayer.querySelector('.player-header');
+    const contentPlayerInterface = divInfoPlayer.querySelector('.player-content');
+
+    header.addEventListener('click', () => {
+      contentPlayerInterface.classList.toggle('collapsed');
+    });
+  }
 }
 
 function endGameBrokeCondition(infoPlayers){
 
-        const playersBroke = [];
-        let endGameCondition = false;
+  const playersBroke = [];
+  let endGameCondition = false;
 
-        infoPlayers.forEach(player => {
-            if (player.money <= 0 && player.propierties.length === 0){
-                playersBroke.push(player);
-            }  
-        });
-        if (playersBroke.length === maxTurn-1){ //Si solo hay un jugador que no este en banca rota, se acaba el juego.
-            endGameCondition = true;
-        }
+  infoPlayers.forEach(player => {
+      if (player.money <= 0 && player.propierties.length === 0){
+        playersBroke.push(player);
+      }  
+  });
+  if (playersBroke.length === infoPlayers.length -1){ //Si solo hay un jugador que no este en banca rota, se acaba el juego.
+    endGameCondition = true;
+  }
 
-        return endGameCondition;
+  return endGameCondition;
 }
+
+function getInfoElementHtml(idElement){
+  const infoObject = JSON.parse(document.getElementById(idElement).getAttribute('data-tile-info')) || {};
+  return infoObject;
+}
+
+
