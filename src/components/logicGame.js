@@ -3,8 +3,8 @@ import {initCraps} from '../components/craps.js'
 // Estructura para guardar los dueños de propiedades
 const propertyOwners = {}; // { 'idPropiedad': 'nombreJugador' }
 const endButton = document.getElementById('endGameBtn')//Boton para finalizar el juego manualmente
-// Variable para acceder a los datos del tablero
-let boardData = {};
+// Variable para acceder a los datos del tablero global para  no hacer importaciones  
+window.boardData = {};
 
 // Función para recibir los datos del tablero
 export function setBoardData(data) {
@@ -18,30 +18,27 @@ export function playGame(infoPlayers, tablero){
   const maxTurn = infoPlayers.length;
 
   initCraps();
-  document.addEventListener('diceRolled', (e) => { //Cada que se tiran los dados es porque se cambia el turno.
-    const numDice = e.detail;
-    if (infoPlayers[turn].active){
-      changePositionPlayer(numDice, infoPlayers[turn], tablero);
-      // Aquí puedes avanzar el turno, mostrar mensajes, etc.
-      
-      //Funciones Dany
-       const action = eventBox(infoPlayers[turn].position.toString(), infoPlayers[turn], infoPlayers);
-            
-      // Procesar la acción (esto reemplaza todo el switch-case anterior)
-       processAction(action, infoPlayers, turn);
+  document.addEventListener('diceRolled', (e) => {
+  const numDice = e.detail;
+  if (infoPlayers[turn].active){
+    changePositionPlayer(numDice, infoPlayers[turn], tablero);
 
-      //Manejo de los turnos
+    // Espera un pequeño instante antes de procesar la acción
+    setTimeout(() => {
+      const action = eventBox(infoPlayers[turn].position.toString(), infoPlayers[turn], infoPlayers);
+      processAction(action, infoPlayers, turn);
+
+      // Manejo de los turnos
       if (turn === maxTurn-1){
         turn = 0;
-      }else{
-        turn ++;
+      } else {
+        turn++;
       }
-      
-    } else {
-        // Acciones para que el usuario esté otra vez activo
-    }
-    
-  });  
+    }, 100); // 100 ms suele ser suficiente
+  } else {
+    // Acciones para que el usuario esté otra vez activo
+  }
+}); 
 }
 
 function changePositionPlayer(numDados, infoPlayer, tablero){
@@ -49,6 +46,10 @@ function changePositionPlayer(numDados, infoPlayer, tablero){
     let posPlayer = infoPlayer.position + numDados;
     if (posPlayer > 40){
         posPlayer -= 40;
+        const goBonus = boardData.bottom.concat(boardData.left, boardData.top, boardData.right)
+        .find(tile => tile.id == 0)?.action?.money || 200; // Busca el bono en el JSON
+        infoPlayer.setMoney(infoPlayer.getMoney() + goBonus);
+        alert(`¡${infoPlayer.getNickName()} pasa por la salida y recibe $${goBonus}!`);
     } 
 
     infoPlayer.position = posPlayer;
@@ -76,6 +77,7 @@ function changePositionPlayer(numDados, infoPlayer, tablero){
 
 // Función principal que determina qué acción realizar según la casilla
 function eventBox(numDice, currentPlayer, allPlayers) {
+
   // Buscar la casilla en el DOM
   const casilla = document.getElementById(`square-${numDice}`);// el id del html 
   if (!casilla) {
@@ -87,12 +89,8 @@ function eventBox(numDice, currentPlayer, allPlayers) {
   const tipo = casilla.getAttribute('data-type');
   let squareData = {}; // Almacenará los datos completos de la casilla
 
-  // Intentar obtener los datos completos de diferentes fuentes
-  if (window.MONOPOLY && window.MONOPOLY.squares && window.MONOPOLY.squares[numDice]) {
-    // Si existe el objeto global MONOPOLY con datos
-    squareData = window.MONOPOLY.squares[numDice];
-  } else if (boardData) 
-    
+  squareData = casilla.getAttribute('data-tile-info') ? JSON.parse(casilla.getAttribute('data-tile-info')) : {};
+
   // 1. CASILLAS TIPO PROPIEDAD
   if (tipo === 'property') {
     // Obtener datos básicos de la propiedad
@@ -162,6 +160,7 @@ function eventBox(numDice, currentPlayer, allPlayers) {
     }
     
     // Seleccionar una carta aleatoria
+    
     const randomIndex = Math.floor(Math.random() * cards.length);
     const card = cards[randomIndex];
     
@@ -176,6 +175,7 @@ function eventBox(numDice, currentPlayer, allPlayers) {
   else if (tipo === 'chance') {
     // Similar a la caja de comunidad
     let cards = boardData.chance || [];
+    console.log("Cartas de chance disponibles:", cards.map(c => c.description));
     if (cards.length === 0) {
       return {
         actionType: 'chance-card',
@@ -186,8 +186,10 @@ function eventBox(numDice, currentPlayer, allPlayers) {
     
     const randomIndex = Math.floor(Math.random() * cards.length);
     const card = cards[randomIndex];
+    console.log("Índice aleatorio:", randomIndex);
     
-    return {
+    
+    return {  
       actionType: 'chance-card',
       description: card.description || "Carta de suerte",
       money: card.action && card.action.money ? card.action.money : 0
@@ -200,7 +202,7 @@ function eventBox(numDice, currentPlayer, allPlayers) {
       case '0': // Casilla de Salida
         return {
           actionType: 'go',
-          bonus: 200 // Bonus por pasar por la casilla de salida
+           bonus: squareData.action?.money || 200 // Usa el valor del JSON o $200 por defecto
         };
       case '10': // Visita a la cárcel
         return {
@@ -356,6 +358,47 @@ function endGameBrokeCondition(infoPlayers){
 
         return endGameCondition;
 }
+function buildHouseOrHotel(propertyId, player) {
+  const property = boardData.bottom.concat(boardData.left, boardData.top, boardData.right)
+    .find(tile => tile.id == propertyId);
+
+  if (!property) {
+    alert("No se encontró la propiedad.");
+    return;
+  }
+
+  // Verificar si el jugador posee todas las propiedades del mismo color
+  const sameColorProperties = boardData.bottom.concat(boardData.left, boardData.top, boardData.right)
+    .filter(tile => tile.color === property.color);
+  const ownsAll = sameColorProperties.every(tile => propertyOwners[tile.id] === player.getNickName());
+
+  if (!ownsAll) {
+    alert("Debes poseer todas las propiedades del mismo color para construir.");
+    return;
+  }
+
+  // Construir casas o hotel
+  if (!property.houses) property.houses = 0;
+  if (property.houses < 4) {
+    property.houses++;
+    player.setMoney(player.getMoney() - 100); // Cada casa cuesta $100
+    property.rent.base = property.rent.withHouse[property.houses - 1]; // Actualizar la renta
+    alert(`Has construido una casa en ${property.name}. Ahora tiene ${property.houses} casas. La renta es de $${property.rent.base}.`);
+  } else if (!property.hotel) {
+    property.hotel = true;
+    property.houses = 0; // Reemplaza las casas por un hotel
+    player.setMoney(player.getMoney() - 250); // El hotel cuesta $250
+    property.rent.base = property.rent.withHotel; // Actualizar la renta
+    alert(`Has construido un hotel en ${property.name}. La renta ahora es de $${property.rent.base}.`);
+    console.log(`Propiedad ${property.name} ahora tiene ${property.houses} casas y hotel: ${property.hotel}`);
+    console.log(`Nueva renta: $${property.rent.base}`);
+  } else {
+    alert("Ya tienes un hotel en esta propiedad.");
+  }
+
+  // Actualizar visualmente la propiedad
+  window.updatePropertyState(propertyId, player.getColor());
+}
 /**
  * Procesa una acción generada por eventBox
  * @param {Object} action - La acción devuelta por eventBox
@@ -373,38 +416,46 @@ function processAction(action, infoPlayers, turn) {
     // COMPRAR PROPIEDADES
     case 'buy-property':
     case 'buy-railroad':
-    case 'buy-utility':
       // Preguntar si quiere comprar
       const wantToBuy = confirm(`¿Quieres comprar ${action.name} por $${action.price}?`);
       if (wantToBuy && infoPlayers[turn].getMoney() >= action.price) {
+        
         // Restar dinero
         infoPlayers[turn].setMoney(infoPlayers[turn].getMoney() - action.price);
         //pintar la casilla del color del jugador
-        
+         //  LÍNEA PARA ACTUALIZAR LA CASILLA
+         window.updatePropertyState(
+        action.propertyId || action.railroadId, 
+        infoPlayers[turn].getColor(), 
+        );
         // Registrar propiedad como comprada
-        propertyOwners[action.propertyId || action.railroadId || action.utilityId] = infoPlayers[turn].getNickName();
+        propertyOwners[action.propertyId || action.railroadId ] = infoPlayers[turn].getNickName();
         // Agregar a la lista de propiedades del jugador (si no existe la creamos)
         if (!infoPlayers[turn].propierties) {
           infoPlayers[turn].propierties = [];
         }
-        infoPlayers[turn].propierties.push(action.propertyId || action.railroadId || action.utilityId);
+        infoPlayers[turn].propierties.push(action.propertyId || action.railroadId );
         alert(`¡Has comprado ${action.name}!`);
       }
       break;
     
     // PAGAR RENTA
-    case 'pay-rent':
-    case 'pay-railroad-rent':
-    case 'pay-utility-rent':
-      // Encontrar al dueño
-      const owner = infoPlayers.find(p => p.getNickName() === action.ownerId);
-      if (owner) {
-        // Transferir dinero
-        infoPlayers[turn].setMoney(infoPlayers[turn].getMoney() - action.rent);
-        owner.setMoney(owner.getMoney() + action.rent);
-        alert(`Pagas $${action.rent} de renta a ${action.ownerId} por ${action.name}`);
-      }
-      break;
+   case 'pay-rent':
+   case 'pay-railroad-rent':
+    const owner = infoPlayers.find(p => p.getNickName() === action.ownerId);
+    if (owner) {
+    // Buscar la propiedad en boardData y usar la renta actualizada
+    const property = boardData.bottom.concat(boardData.left, boardData.top, boardData.right)
+      .find(tile => tile.id == action.propertyId);
+    const rentAmount = property?.rent.base || 0;
+
+    infoPlayers[turn].setMoney(infoPlayers[turn].getMoney() - rentAmount);
+    owner.setMoney(owner.getMoney() + rentAmount);
+    alert(`Pagas $${rentAmount} de renta a ${action.ownerId} por ${action.name}`);
+    console.log(`Jugador ${infoPlayers[turn].getNickName()} paga $${rentAmount} a ${action.ownerId}`);
+    loadPlayerInteface(owner);
+   }
+   break;
     
     // CARTAS
     case 'community-card':
@@ -425,6 +476,7 @@ function processAction(action, infoPlayers, turn) {
     case 'go-to-jail':
       infoPlayers[turn].position = action.destination;
       alert("¡Vas a la cárcel!");
+      infoPlayers[turn].active = false; // El jugador pierde su próximo turno
       break;
     
     // PAGAR IMPUESTO
@@ -432,6 +484,19 @@ function processAction(action, infoPlayers, turn) {
       infoPlayers[turn].setMoney(infoPlayers[turn].getMoney() - action.amount);
       alert(`Pagas $${action.amount} de ${action.name}`);
       break;
+
+    // PASAR POR LA SALIDA
+    case 'go':
+      infoPlayers[turn].setMoney(infoPlayers[turn].getMoney() + action.bonus);
+      alert(`¡Pasas por la salida y recibes $${action.bonus}!`);
+      break;
+
+    case 'own-property':
+      const canBuild = confirm(`¿Quieres construir en ${action.name}?`);
+      if (canBuild) {
+      buildHouseOrHotel(action.propertyId, infoPlayers[turn]);
+  }
+  break;
   }
   
   // Actualizar interfaz después de la acción
