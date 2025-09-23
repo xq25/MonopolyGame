@@ -86,7 +86,6 @@ fetch(url)
         }
       });
     });
-    initCraps();
     //debemos colocar el evento de tablero ready para que se coloquen justo despues que las casillas se ccreen en el DOM
     
     // Pasar los datos a logicGame.js

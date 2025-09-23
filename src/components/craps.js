@@ -15,6 +15,7 @@ function initCraps(
 
   // El contenedor principal del popup (ajusta el id según tu HTML)
   const popup = result.closest('.crap-section') || result.parentElement;
+  let response = null;
 
   if (!rollButton || !crap1 || !crap2 || !result || !manualCrap1 || !manualCrap2) return;
 
@@ -78,8 +79,6 @@ function initCraps(
     }, 2000); // Ocultar después de 2 segundos en caso de que no se haya ocultado ya  
     document.dispatchEvent(new CustomEvent('diceRolled', { detail: total })); // Disparamos el evento personalizado con el total de la tirada
   });
-  document.addEventListener('diceRolled', (event) => {
-    return event.detail;
-  });
+  
 }
 export { initCraps };
