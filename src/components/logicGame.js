@@ -11,7 +11,7 @@ export function setBoardData(data) {
   console.log("Datos del tablero cargados en logicGame.js");
 }
 
-function playGame(infoPlayers){
+export function playGame(infoPlayers, tablero){
     let endGame = false;
     let turn = 0;
     const maxTurn = infoPlayers.length; //Almacenamos la cantidad de players que se tienen dentro del juego para poder manejar los turnos.
