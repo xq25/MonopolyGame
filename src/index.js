@@ -1,7 +1,7 @@
 import { loadContent } from './utils/utils.js'; // Importa la función para cargar contenido
 import { changeSidebar } from './components/SidebarToggle.js'; // Importa la función para cambiar la barra lateral
 
-import {loadPlayerInteface, initializePlayersClass, changePositionPlayer} from './components/logicGame.js';
+import {loadPlayerInteface, initializePlayersClass, playGame} from './components/logicGame.js';
 
 import { cargarRanking } from './components/ranking.js'; // Importa la función para cargar el ranking
 
@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
             objectList.forEach(player => {
                 loadPlayerInteface(player);
             });
-            changePositionPlayer(5, objectList[0], tablero);
+            playGame(objectList, tablero)
         });
         //Aqui hay que hacer otra funcion en la cual despues de cargar el tablero se carguen el resto de los elementos e inicie el juego
     }, { once: true }); //Esto nos indica que solo va a escuchar este evento una unica vez. Ya que solo despues de que la info en los formularios este bien, se iniciara el juego.

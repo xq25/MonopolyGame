@@ -1,4 +1,5 @@
 import { Player } from '../model/players.js'
+import {initCraps} from '../components/craps.js'
 // Estructura para guardar los dueños de propiedades
 const propertyOwners = {}; // { 'idPropiedad': 'nombreJugador' }
 const endButton = document.getElementById('endGameBtn')//Boton para finalizar el juego manualmente
@@ -11,32 +12,39 @@ export function setBoardData(data) {
   console.log("Datos del tablero cargados en logicGame.js");
 }
 
-function playGame(infoPlayers){
-    let endGame = false;
-    let turn = 0;
-    const maxTurn = infoPlayers.length;
+export function playGame(infoPlayers, tablero){
+  let endGame = false;
+  let turn = 0;
+  const maxTurn = infoPlayers.length;
 
-    while (!endGame){
-        if (infoPlayers[turn].active){
-            // Código para lanzar dados y mover jugador
+  initCraps();
+  document.addEventListener('diceRolled', (e) => { //Cada que se tiran los dados es porque se cambia el turno.
+    const numDice = e.detail;
+    if (infoPlayers[turn].active){
+      changePositionPlayer(numDice, infoPlayers[turn], tablero);
+      // Aquí puedes avanzar el turno, mostrar mensajes, etc.
+      
+      //Funciones Dany
+       const action = eventBox(infoPlayers[turn].position.toString(), infoPlayers[turn], infoPlayers);
             
-            // Obtener acciones de la casilla donde cayó
-            const action = eventBox(infoPlayers[turn].position.toString(), infoPlayers[turn], infoPlayers);
-            
-            // Procesar la acción (esto reemplaza todo el switch-case anterior)
-            processAction(action, infoPlayers, turn);
-        }
-        else {
-            // Acciones para jugadores inactivos
-        }
-        
-        turn++;
-        if (turn === maxTurn){
-            turn = 0;
-        }
+      // Procesar la acción (esto reemplaza todo el switch-case anterior)
+       processAction(action, infoPlayers, turn);
+
+      //Manejo de los turnos
+      if (turn === maxTurn-1){
+        turn = 0;
+      }else{
+        turn ++;
+      }
+      
+    } else {
+        // Acciones para que el usuario esté otra vez activo
     }
+    
+  });  
 }
-export function changePositionPlayer(numDados, infoPlayer, tablero){
+
+function changePositionPlayer(numDados, infoPlayer, tablero){
     // Calcula la nueva posición del jugador
     let posPlayer = infoPlayer.position + numDados;
     if (posPlayer > 40){
@@ -47,7 +55,6 @@ export function changePositionPlayer(numDados, infoPlayer, tablero){
 
     // Busca la casilla correspondiente usando el id generado en tablero.js
     const targetSquare = document.getElementById(`square-${posPlayer}`)
-    console.log(targetSquare)
     if (!targetSquare) {
         console.error(`No existe la casilla con id="square-${posPlayer}" en el tablero.`);
         return;
@@ -68,7 +75,7 @@ export function changePositionPlayer(numDados, infoPlayer, tablero){
 }
 
 // Función principal que determina qué acción realizar según la casilla
-export function eventBox(numDice, currentPlayer, allPlayers) {
+function eventBox(numDice, currentPlayer, allPlayers) {
   // Buscar la casilla en el DOM
   const casilla = document.getElementById(`square-${numDice}`);// el id del html 
   if (!casilla) {
@@ -296,7 +303,6 @@ export function eventBox(numDice, currentPlayer, allPlayers) {
   return {}; // Devuelve un objeto vacío - no hay acción
 }
 
-
 //Esta funcion nos permite inicializar como objetos la informacion de los usuarios que tenemos.
 export function initializePlayersClass(playersList){
     let objectClassList = [];
@@ -306,6 +312,7 @@ export function initializePlayersClass(playersList){
     });
     return objectClassList;
 }
+
 //Esta funcion nos permite cargar la informacion de cada jugador. Vamos a reutilizarla al detectar cambios a medida que pasa el juego.
 export function loadPlayerInteface(objectPlayer){
 
@@ -332,6 +339,7 @@ export function loadPlayerInteface(objectPlayer){
         gameDiv.appendChild(divInfoPlayer); //Agregamos cada recuadro a nuestra visualizacion del juego.
     }
 }
+
 function endGameBrokeCondition(infoPlayers){
 
         const playersBroke = [];
