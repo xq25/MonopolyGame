@@ -52,5 +52,13 @@ export class Player {
     }
     setPosition(newPosition){
         this.position = newPosition;
-    }   
+    }
+    // Metodos de carcell   
+    isJailed(){
+        return this.jailed;
+    }
+
+    setJailed(value){
+        this.jailed = value;
+    }
 }

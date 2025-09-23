@@ -1,25 +1,26 @@
 import { initCraps } from "./craps.js";
 
 const board = document.getElementById("board");
+export let boardData = {}; // Variable global exportada
 const url = "http://127.0.0.1:5000/board";
 
 function makeSquare(tile) { //creamos las casillas
   const div = document.createElement("div"); // creamos un div para estas en los bordes
   div.className = "square";
+  
   //Agregamos todo esto al html:SQUAREEEE
   //no es necesario hacer una funcion ya que desde aca se la podemos asignar(mucho mas rapido jaja)
-  if (tile.id) { // si la casilla tiene id
+  if (tile.id !== undefined) { // si la casilla tiene id
     div.id = `square-${tile.id}`; // se lo asignamos al div
   }
-   // Guardamos el tipo de casilla como atributo
-  if (tile.type) { //si la casilla tiene tipo, se lo asignamos como atributo data-type
-    div.setAttribute('data-type', tile.type);    
-  }
-// se le agrega manualmente el nombre a la salida
-  // if (tile.name){
-  //   div.setName('data-name', tile.name)
-  // }
 
+  // AÑADE ESTA LÍNEA: Agregar data-type como atributo separado
+  if (tile.type) div.setAttribute('data-type', tile.type);
+
+  
+  // ESTA ES LA LÍNEA CLAVE: toda la información en un solo atributo
+  div.setAttribute('data-tile-info', JSON.stringify(tile));
+  
   if (tile.color) {
     const color = document.createElement("div");// si tiene color, creamos un div para el color y se lo colocamos arriba
     color.className = "color-bar";// le asignamos la clase
@@ -28,7 +29,7 @@ function makeSquare(tile) { //creamos las casillas
   }
 
   const name = document.createElement("div");
-  name.textContent = tile.name; // le asignamos el nombre y inyectamos a la casilla en el tablero
+  name.textContent = tile.name || ''; // le asignamos el nombre y inyectamos a la casilla en el tablero
   div.appendChild(name);
 
   return div;
@@ -37,7 +38,15 @@ function makeSquare(tile) { //creamos las casillas
 fetch(url)
   .then(res => res.json())
   .then(data => {
-    // Solo casillas del tablero (sin comunidad/sorpresa )
+    // Guardamos los datos completos del tablero
+    boardData = data;
+
+    const board = document.getElementById("board");
+    if (!board) {
+      console.error("Error: No se encontró el elemento con id 'board'");
+      return;
+    }
+    
     const tiles = [...data.bottom, ...data.left, ...data.top, ...data.right];
 
     const grid = Array.from({ length: 11 }, () => Array(11).fill(null));
@@ -79,5 +88,22 @@ fetch(url)
     });
     initCraps();
     //debemos colocar el evento de tablero ready para que se coloquen justo despues que las casillas se ccreen en el DOM
+    
+    // Pasar los datos a logicGame.js
+    // try {
+    //   import('./logicGame.js').then(module => {
+    //     if (typeof module.setBoardData === 'function') {
+    //       module.setBoardData(data);
+    //       console.log("Datos del tablero enviados a logicGame.js");
+    //     }
+    //   });
+    // } catch (error) {
+    //   console.error("Error al cargar módulo logicGame.js:", error);
+    // }
+    
+    // Notificar que el tablero está listo
     document.dispatchEvent(new Event('boardReady'));
+  })
+  .catch(error => {
+    console.error("Error al cargar el tablero:", error);
   });
