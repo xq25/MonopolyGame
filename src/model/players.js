@@ -7,6 +7,8 @@ export class Player {
         this.active = true;
         this.position = 0;
         this.propierties = [];
+        this.mortgages = [];
+        this.loans = [];
 
     }
     //Accesores y mutadores de la clase.
@@ -53,12 +55,18 @@ export class Player {
     setPosition(newPosition){
         this.position = newPosition;
     }
-    // Metodos de carcell   
-    isJailed(){
-        return this.jailed;
+
+    getMortgages(){
+        return this.mortgages;
+    }
+    setMortgages(mortgagesList){
+        this.mortgages =  mortgagesList;
     }
 
-    setJailed(value){
-        this.jailed = value;
+    getloans(){
+        return this.loans;
+    }
+    setLoans(loansList){
+        this.loans = loansList;
     }
 }

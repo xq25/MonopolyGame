@@ -3,8 +3,8 @@ import {initCraps} from '../components/craps.js'
 // Estructura para guardar los dueños de propiedades
 const propertyOwners = {}; // { 'idPropiedad': 'nombreJugador' }
 const endButton = document.getElementById('endGameBtn')//Boton para finalizar el juego manualmente
-// Variable para acceder a los datos del tablero
-let boardData = {};
+// Variable para acceder a los datos del tablero global para  no hacer importaciones  
+window.boardData = {};
 
 // Función para recibir los datos del tablero
 export function setBoardData(data) {
@@ -20,66 +20,72 @@ export function playGame(infoPlayers, tablero){
   
   initCraps();
   if(popup){ popup.style.display = "block"; }
-  document.addEventListener('diceRolled', (e) => { //Cada que se tiran los dados es porque se cambia el turno.
-    const numDice = e.detail;
-    setTimeout(() => {
+  document.addEventListener('diceRolled', (e) => {
+  const numDice = e.detail;
+  setTimeout(() => {
       if(popup) popup.style.display = "none";
-    }, 1000);
-    if (infoPlayers[turn].active){
-      changePositionPlayer(numDice, infoPlayers[turn], tablero);
-      // Aquí puedes avanzar el turno, mostrar mensajes, etc.
-      
-      //Funciones Dany
+    }, 1500);
+  if (infoPlayers[turn].active){
+    changePositionPlayer(numDice, infoPlayers[turn], tablero);
 
-      //Manejo de los turnos
-      
+    // Espera un pequeño instante antes de procesar la acción
+    setTimeout(() => {
+      const action = eventBox(infoPlayers[turn].position.toString(), infoPlayers[turn], infoPlayers);
+      processAction(action, infoPlayers, turn);
+
+      // Manejo de los turnos
       if (turn === maxTurn-1){
         turn = 0;
-      }else{
-        turn ++;
+      } else {
+        turn++;
       }
+    }, 100); 
     setTimeout(() => {
-      if(popup) popup.style.display = "block"
-    }, 2000);
-    } else {
-        // Acciones para que el usuario esté otra vez activo
-    }
-    
-  });  
+      if(popup) popup.style.display = "block";
+    }, 3000);
+  } 
+  else {
+    // Acciones para que el usuario esté otra vez activo
+  }
+}); 
 }
 
 function changePositionPlayer(numDados, infoPlayer, tablero){
-    // Calcula la nueva posición del jugador
-    let posPlayer = infoPlayer.position + numDados;
-    if (posPlayer > 40){
-        posPlayer -= 40;
-    } 
+  // Calcula la nueva posición del jugador
+  let posPlayer = infoPlayer.position + numDados;
+  if (posPlayer >= 40){
+    posPlayer -= 40;
+    const goBonus = boardData.bottom.concat(boardData.left, boardData.top, boardData.right)
+        .find(tile => tile.id == 0)?.action?.money || 200; // Busca el bono en el JSON
+        infoPlayer.setMoney(infoPlayer.getMoney() + goBonus);
+        alert(`¡${infoPlayer.getNickName()} pasa por la salida y recibe $${goBonus}!`);
+  } 
+  infoPlayer.position = posPlayer;
 
-    infoPlayer.position = posPlayer;
+  // Busca la casilla correspondiente usando el id generado en tablero.js
+  const targetSquare = document.getElementById(`square-${posPlayer}`)
+  if (!targetSquare) {
+      console.error(`No existe la casilla con id="square-${posPlayer}" en el tablero.`);
+      return;
+  }
 
-    // Busca la casilla correspondiente usando el id generado en tablero.js
-    const targetSquare = document.getElementById(`square-${posPlayer}`)
-    if (!targetSquare) {
-        console.error(`No existe la casilla con id="square-${posPlayer}" en el tablero.`);
-        return;
-    }
+  // Elimina el token anterior si existe
+  const oldToken = tablero.querySelector(`#token-${infoPlayer.color}`);
+  console.log(oldToken)
+  if (oldToken){
+      oldToken.remove();
+  }
 
-    // Elimina el token anterior si existe
-    const oldToken = tablero.querySelector(`#token-${infoPlayer.color}`);
-    console.log(oldToken)
-    if (oldToken){
-        oldToken.remove();
-    }
-
-    // Crea y agrega el nuevo token
-    const tokenPlayer = document.createElement('div');
-    tokenPlayer.classList.add('token');
-    tokenPlayer.id = `token-${infoPlayer.color}`;
-    targetSquare.appendChild(tokenPlayer);
+  // Crea y agrega el nuevo token
+  const tokenPlayer = document.createElement('div');
+  tokenPlayer.classList.add('token');
+  tokenPlayer.id = `token-${infoPlayer.color}`;
+  targetSquare.appendChild(tokenPlayer);
 }
 
 // Función principal que determina qué acción realizar según la casilla
 function eventBox(numDice, currentPlayer, allPlayers) {
+
   // Buscar la casilla en el DOM
   const casilla = document.getElementById(`square-${numDice}`);// el id del html 
   if (!casilla) {
@@ -91,12 +97,8 @@ function eventBox(numDice, currentPlayer, allPlayers) {
   const tipo = casilla.getAttribute('data-type');
   let squareData = {}; // Almacenará los datos completos de la casilla
 
-  // Intentar obtener los datos completos de diferentes fuentes
-  if (window.MONOPOLY && window.MONOPOLY.squares && window.MONOPOLY.squares[numDice]) {
-    // Si existe el objeto global MONOPOLY con datos
-    squareData = window.MONOPOLY.squares[numDice];
-  } else if (boardData) 
-    
+  squareData = casilla.getAttribute('data-tile-info') ? JSON.parse(casilla.getAttribute('data-tile-info')) : {};
+
   // 1. CASILLAS TIPO PROPIEDAD
   if (tipo === 'property') {
     // Obtener datos básicos de la propiedad
@@ -166,6 +168,7 @@ function eventBox(numDice, currentPlayer, allPlayers) {
     }
     
     // Seleccionar una carta aleatoria
+    
     const randomIndex = Math.floor(Math.random() * cards.length);
     const card = cards[randomIndex];
     
@@ -180,6 +183,7 @@ function eventBox(numDice, currentPlayer, allPlayers) {
   else if (tipo === 'chance') {
     // Similar a la caja de comunidad
     let cards = boardData.chance || [];
+    console.log("Cartas de chance disponibles:", cards.map(c => c.description));
     if (cards.length === 0) {
       return {
         actionType: 'chance-card',
@@ -190,8 +194,10 @@ function eventBox(numDice, currentPlayer, allPlayers) {
     
     const randomIndex = Math.floor(Math.random() * cards.length);
     const card = cards[randomIndex];
+    console.log("Índice aleatorio:", randomIndex);
     
-    return {
+    
+    return {  
       actionType: 'chance-card',
       description: card.description || "Carta de suerte",
       money: card.action && card.action.money ? card.action.money : 0
@@ -204,7 +210,7 @@ function eventBox(numDice, currentPlayer, allPlayers) {
       case '0': // Casilla de Salida
         return {
           actionType: 'go',
-          bonus: 200 // Bonus por pasar por la casilla de salida
+           bonus: squareData.action?.money || 200 // Usa el valor del JSON o $200 por defecto
         };
       case '10': // Visita a la cárcel
         return {
@@ -309,54 +315,233 @@ function eventBox(numDice, currentPlayer, allPlayers) {
 
 //Esta funcion nos permite inicializar como objetos la informacion de los usuarios que tenemos.
 export function initializePlayersClass(playersList){
-    let objectClassList = [];
+  let objectClassList = [];
 
-    objectClassList = playersList.map(item => { //La funcion map nos permite acceder a cada elemento de una lista para rellenar otra, pero si o si por cada item debe haber un return.
-        return new Player(item.nickName, item.country, item.color ) //Creamos la instancia de cada player.
-    });
-    return objectClassList;
+  objectClassList = playersList.map(item => { //La funcion map nos permite acceder a cada elemento de una lista para rellenar otra, pero si o si por cada item debe haber un return.
+    return new Player(item.nickName, item.country, item.color ) //Creamos la instancia de cada player.
+  });
+  return objectClassList;
 }
 
 //Esta funcion nos permite cargar la informacion de cada jugador. Vamos a reutilizarla al detectar cambios a medida que pasa el juego.
-export function loadPlayerInteface(objectPlayer){
+export function loadPlayerInteface(objectPlayer) {
+  if (!objectPlayer) return;
 
-    if (objectPlayer){
+  const gameDiv = document.getElementById('gameDiv');
+  // Buscamos si ya existe la interfaz para este jugador
+  let divInfoPlayer = document.getElementById(`player-${objectPlayer.color}`);
 
-        const gameDiv = document.getElementById('gameDiv');
-        
-        let divInfoPlayer = document.createElement('div');
-        divInfoPlayer.id = `player-${objectPlayer.color}`; //Asignamos el id correspondiente a cada jugar. Esta clase es la que indicara su posicion en la pantalla y las diferencias de colores.
-        divInfoPlayer.classList.add('playerInterface'); //Esta es la clase general que genera el recuadro con el mismo tamaño para todos.
-        divInfoPlayer.innerHTML = `
-            <h2><img src="https://flagsapi.com/${objectPlayer.country.toUpperCase()}/flat/64.png" alt="Bandera-${objectPlayer.country}" class="flag">${objectPlayer.nick_name}</h2>
-            <p class="money-text"><strong>Dinero disponible:</strong> ${objectPlayer.money}</p>
-            <p class= "properties-text">Propiedades adquiridas:</p>
-            <ul>
-                
-            </ul>
+  // Construimos las options del select a partir de objectPlayer.propierties
+  const optionsPropierties =
+    objectPlayer.propierties && objectPlayer.propierties.length > 0
+      ? objectPlayer.propierties.map(
+          (prop) => `<option value="${prop}">${prop}</option>`
+        ).join("")
+      : `<option disabled>No hay propiedades</option>`;
 
-            <p class="h&p-text">Hipotecas y préstamos activos:</p>
-            <ul>
-            
-            </ul>
-        `;
-        gameDiv.appendChild(divInfoPlayer); //Agregamos cada recuadro a nuestra visualizacion del juego.
-    }
+  // Si no existe, lo creamos y lo agregamos al DOM
+  if (!divInfoPlayer) {
+    divInfoPlayer = document.createElement('div');
+    divInfoPlayer.id = `player-${objectPlayer.color}`;
+    divInfoPlayer.classList.add('playerInterface');
+    gameDiv.appendChild(divInfoPlayer);
+  }
+
+  // Actualizamos su contenido (esto sobreescribe si ya existía)
+  divInfoPlayer.innerHTML = `
+    <h2 class="player-header">
+      <img src="https://flagsapi.com/${objectPlayer.country.toUpperCase()}/flat/64.png" 
+           alt="Bandera-${objectPlayer.country}" 
+           class="flag">
+      ${objectPlayer.nick_name}
+    </h2>
+    <div class="player-content">
+      <p class="money-text"><strong>Dinero :</strong> $${objectPlayer.money}</p>
+      <select class="properties-select">
+        <option value="" selected hidden>Propiedades</option>
+        ${optionsPropierties}
+      </select>
+    </div>
+  `;
+
+  // Reasignamos el evento al header
+  const header = divInfoPlayer.querySelector('.player-header');
+  const contentPlayerInterface = divInfoPlayer.querySelector('.player-content');
+
+  // Eliminamos listeners anteriores para evitar duplicados
+  header.onclick = null;
+
+  // Añadimos el toggle para mostrar/ocultar contenido
+  header.addEventListener('click', () => {
+    contentPlayerInterface.classList.toggle('collapsed');
+  });
 }
 
 function endGameBrokeCondition(infoPlayers){
 
-        const playersBroke = [];
-        let endGameCondition = false;
+  const playersBroke = [];
+  let endGameCondition = false;
 
-        infoPlayers.forEach(player => {
-            if (player.money <= 0 && player.propierties.length === 0){
-                playersBroke.push(player);
-            }  
-        });
-        if (playersBroke.length === maxTurn-1){ //Si solo hay un jugador que no este en banca rota, se acaba el juego.
-            endGameCondition = true;
+  infoPlayers.forEach(player => {
+      if (player.money <= 0 && player.propierties.length === 0){
+        playersBroke.push(player);
+      }  
+  });
+  if (playersBroke.length === infoPlayers.length -1){ //Si solo hay un jugador que no este en banca rota, se acaba el juego.
+    endGameCondition = true;
+  }
+
+  return endGameCondition;
+}
+
+// function getInfoElementHtml(idElement){
+//   console.log(idElement)
+//   const infoObject = JSON.parse(document.getElementById(idElement).getAttribute('data-tile-info')) || {};
+//   return infoObject;
+// }
+
+
+function buildHouseOrHotel(propertyId, player) {
+  const property = boardData.bottom.concat(boardData.left, boardData.top, boardData.right)
+    .find(tile => tile.id == propertyId);
+
+  if (!property) {
+    alert("No se encontró la propiedad.");
+    return;
+  }
+
+  // Verificar si el jugador posee todas las propiedades del mismo color
+  const sameColorProperties = boardData.bottom.concat(boardData.left, boardData.top, boardData.right)
+    .filter(tile => tile.color === property.color);
+  const ownsAll = sameColorProperties.every(tile => propertyOwners[tile.id] === player.getNickName());
+
+  if (!ownsAll) {
+    alert("Debes poseer todas las propiedades del mismo color para construir.");
+    return;
+  }
+
+  // Construir casas o hotel
+  if (!property.houses) property.houses = 0;
+  if (property.houses < 4) {
+    property.houses++;
+    player.setMoney(player.getMoney() - 100); // Cada casa cuesta $100
+    property.rent.base = property.rent.withHouse[property.houses - 1]; // Actualizar la renta
+    alert(`Has construido una casa en ${property.name}. Ahora tiene ${property.houses} casas. La renta es de $${property.rent.base}.`);
+  } else if (!property.hotel) {
+    property.hotel = true;
+    property.houses = 0; // Reemplaza las casas por un hotel
+    player.setMoney(player.getMoney() - 250); // El hotel cuesta $250
+    property.rent.base = property.rent.withHotel; // Actualizar la renta
+    alert(`Has construido un hotel en ${property.name}. La renta ahora es de $${property.rent.base}.`);
+    console.log(`Propiedad ${property.name} ahora tiene ${property.houses} casas y hotel: ${property.hotel}`);
+    console.log(`Nueva renta: $${property.rent.base}`);
+  } else {
+    alert("Ya tienes un hotel en esta propiedad.");
+  }
+
+  // Actualizar visualmente la propiedad
+  window.updatePropertyState(propertyId, player.getColor());
+}
+/**
+ * Procesa una acción generada por eventBox
+ * @param {Object} action - La acción devuelta por eventBox
+ * @param {Array} infoPlayers - Lista de jugadores
+ * @param {number} turn - Índice del jugador actual
+ */
+function processAction(action, infoPlayers, turn) {
+  // Si no hay acción (objeto vacío) no hacemos nada
+  if (!action || Object.keys(action).length === 0) {
+    return;
+  }
+  
+  // Procesamos según el tipo de acción
+  switch(action.actionType) {
+    // COMPRAR PROPIEDADES
+    case 'buy-property':
+    case 'buy-railroad':
+      // Preguntar si quiere comprar
+      const wantToBuy = confirm(`¿Quieres comprar ${action.name} por $${action.price}?`);
+      if (wantToBuy && infoPlayers[turn].getMoney() >= action.price) {
+        
+        // Restar dinero
+        infoPlayers[turn].setMoney(infoPlayers[turn].getMoney() - action.price);
+        //pintar la casilla del color del jugador
+         //  LÍNEA PARA ACTUALIZAR LA CASILLA
+         window.updatePropertyState(
+        action.propertyId || action.railroadId, 
+        infoPlayers[turn].getColor(), 
+        );
+        // Registrar propiedad como comprada
+        propertyOwners[action.propertyId || action.railroadId ] = infoPlayers[turn].getNickName();
+        // Agregar a la lista de propiedades del jugador (si no existe la creamos)
+        if (!infoPlayers[turn].propierties) {
+          infoPlayers[turn].propierties = [];
         }
+        infoPlayers[turn].propierties.push(action.propertyId || action.railroadId );
+        alert(`¡Has comprado ${action.name}!`);
+      }
+      break;
+    
+    // PAGAR RENTA
+   case 'pay-rent':
+   case 'pay-railroad-rent':
+    const owner = infoPlayers.find(p => p.getNickName() === action.ownerId);
+    if (owner) {
+    // Buscar la propiedad en boardData y usar la renta actualizada
+    const property = boardData.bottom.concat(boardData.left, boardData.top, boardData.right)
+      .find(tile => tile.id == action.propertyId);
+    const rentAmount = property?.rent.base || 0;
 
-        return endGameCondition;
+    infoPlayers[turn].setMoney(infoPlayers[turn].getMoney() - rentAmount);
+    owner.setMoney(owner.getMoney() + rentAmount);
+    alert(`Pagas $${rentAmount} de renta a ${action.ownerId} por ${action.name}`);
+    console.log(`Jugador ${infoPlayers[turn].getNickName()} paga $${rentAmount} a ${action.ownerId}`);
+    loadPlayerInteface(owner);
+   }
+   break;
+    
+    // CARTAS
+    case 'community-card':
+    case 'chance-card':
+      alert(`${action.description}`);
+      if (action.money !== 0) {
+        // Modificar dinero según la carta
+        infoPlayers[turn].setMoney(infoPlayers[turn].getMoney() + action.money);
+        if (action.money > 0) {
+          alert(`Recibes $${action.money}`);
+        } else {
+          alert(`Pagas $${Math.abs(action.money)}`);
+        }
+      }
+      break;
+    
+    // IR A LA CÁRCEL
+    case 'go-to-jail':
+      infoPlayers[turn].position = action.destination;
+      alert("¡Vas a la cárcel!");
+      infoPlayers[turn].active = false; // El jugador pierde su próximo turno
+      break;
+    
+    // PAGAR IMPUESTO
+    case 'pay-tax':
+      infoPlayers[turn].setMoney(infoPlayers[turn].getMoney() - action.amount);
+      alert(`Pagas $${action.amount} de ${action.name}`);
+      break;
+
+    // PASAR POR LA SALIDA
+    case 'go':
+      infoPlayers[turn].setMoney(infoPlayers[turn].getMoney() + action.bonus);
+      alert(`¡Pasas por la salida y recibes $${action.bonus}!`);
+      break;
+
+    case 'own-property':
+      const canBuild = confirm(`¿Quieres construir en ${action.name}?`);
+      if (canBuild) {
+      buildHouseOrHotel(action.propertyId, infoPlayers[turn]);
+  }
+  break;
+  }
+  
+  // Actualizar interfaz después de la acción
+  loadPlayerInteface(infoPlayers[turn]);
 }

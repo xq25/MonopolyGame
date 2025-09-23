@@ -97,7 +97,7 @@ Sin el IIFE, podrías tener problemas si el script se carga antes de que el HTML
         //Verificamsos si existe un formulario con datos del jugador; Sino no devuelve nada 
         if (userForm){
             // Extrae los valores de los campos (ajusta los nombres según tu formUser.html)
-            const nickName = userForm.querySelector('input')?.value || ''; //Si existe algun elemento input dentro de nuestro formulario, le extraemos su valor
+            const nickName = userForm.querySelector('input')?.value.trim() || ''; //Si existe algun elemento input dentro de nuestro formulario, le extraemos su valor
             const country = userForm.querySelector('.countries-selector')?.value || '';//Si existe algun elemento que pertenezca a la clase countries-selector, le extraemos su valor seleccionado
             
             response = { 
@@ -116,7 +116,7 @@ Sin el IIFE, podrías tener problemas si el script se carga antes de que el HTML
         let nameValidation = true;
         let countryValidation = true;
 
-        //Validamos que el formulario este activo
+        //Validamos que el formulario este activo.
         if (data !== null){
             //Extraemos el div que esta destinado para mostrar el error que implica no seleccionar o no rellenar un campo
             const errorDivSelect = formElement.querySelector('.error-select');
@@ -184,7 +184,6 @@ Sin el IIFE, podrías tener problemas si el script se carga antes de que el HTML
         if(infoPlayers.length === activeForms){ //Validamos que todos los formularios activos esten bien diligenciados para empezar el juego.
             //Creamos e invocamos un customEvent que va a ser escuchado desde nuestro index, en el cual pasaremos la informacion de los usuarios para empezar a trabajarla desde alli.
             document.dispatchEvent(new CustomEvent('playersReady', {detail: infoPlayers }));
-            // console.log(infoPlayers)
         }
 
         //Se podria mostrar un mensaje de alerta general para que se revise bien los formularios y captar la atencion sobre los campos sin diligenciar.
