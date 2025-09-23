@@ -13,25 +13,31 @@ export function setBoardData(data) {
 }
 
 export function playGame(infoPlayers, tablero){
-    let endGame = false;
-    let turn = 0;
-    const maxTurn = infoPlayers.length;
+  let endGame = false;
+  let turn = 0;
+  const maxTurn = infoPlayers.length;
 
-    initCraps();
-    document.addEventListener('diceRolled', (e) => {
-        const numDice = e.detail;
-        console.log(numDice);
-        if (infoPlayers[turn].active){
-            changePositionPlayer(numDice, infoPlayers[turn], tablero);
-            // Aquí puedes avanzar el turno, mostrar mensajes, etc.
-            
-            if (turn === maxTurn) turn = 0;
-        } else {
-            // Acciones para que el usuario esté otra vez activo
-        }
-    });
+  initCraps();
+  document.addEventListener('diceRolled', (e) => { //Cada que se tiran los dados es porque se cambia el turno.
+    const numDice = e.detail;
+    if (infoPlayers[turn].active){
+      changePositionPlayer(numDice, infoPlayers[turn], tablero);
+      // Aquí puedes avanzar el turno, mostrar mensajes, etc.
+      
+      //Funciones Dany
+
+      //Manejo de los turnos
+      if (turn === maxTurn-1){
+        turn = 0;
+      }else{
+        turn ++;
+      }
+      
+    } else {
+        // Acciones para que el usuario esté otra vez activo
+    }
     
-    
+  });  
 }
 
 function changePositionPlayer(numDados, infoPlayer, tablero){
@@ -65,7 +71,7 @@ function changePositionPlayer(numDados, infoPlayer, tablero){
 }
 
 // Función principal que determina qué acción realizar según la casilla
-export function eventBox(numDice, currentPlayer, allPlayers) {
+function eventBox(numDice, currentPlayer, allPlayers) {
   // Buscar la casilla en el DOM
   const casilla = document.getElementById(`square-${numDice}`);// el id del html 
   if (!casilla) {
@@ -302,6 +308,7 @@ export function initializePlayersClass(playersList){
     });
     return objectClassList;
 }
+
 //Esta funcion nos permite cargar la informacion de cada jugador. Vamos a reutilizarla al detectar cambios a medida que pasa el juego.
 export function loadPlayerInteface(objectPlayer){
 
@@ -328,6 +335,7 @@ export function loadPlayerInteface(objectPlayer){
         gameDiv.appendChild(divInfoPlayer); //Agregamos cada recuadro a nuestra visualizacion del juego.
     }
 }
+
 function endGameBrokeCondition(infoPlayers){
 
         const playersBroke = [];

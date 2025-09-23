@@ -14,7 +14,7 @@ function initCraps(
   const manualCrap2 = document.getElementById(manualCrap2Id);
 
   // El contenedor principal del popup (ajusta el id según tu HTML)
-  const popup = result.closest('.crap-section') || result.parentElement;
+  // const popup = result.closest('.crap-section') || result.parentElement;
   let response = null;
 
   if (!rollButton || !crap1 || !crap2 || !result || !manualCrap1 || !manualCrap2) return;
@@ -40,7 +40,7 @@ function initCraps(
   }
 
   rollButton.addEventListener("click", () => {
-    rollButton.disabled = true;
+    // rollButton.disabled = true;
     
     let roll1 = parseInt(manualCrap1.value, 10);
     let roll2 = parseInt(manualCrap2.value, 10);
@@ -67,16 +67,16 @@ function initCraps(
     result.classList.add("animate");
 
     // Mostrar el popup
-    if (popup) popup.style.display = "block";
+    // if (popup) popup.style.display = "block";
 
     setTimeout(() => {
       crap1.classList.remove("animate");
       crap2.classList.remove("animate");
       result.classList.remove("animate");
     }, 500);
-    setTimeout(() => {
-      if (popup) popup.style.display = "none";
-    }, 2000); // Ocultar después de 2 segundos en caso de que no se haya ocultado ya  
+    // setTimeout(() => {
+    //   if (popup) popup.style.display = "none";
+    // }, 2000); // Ocultar después de 2 segundos en caso de que no se haya ocultado ya  
     document.dispatchEvent(new CustomEvent('diceRolled', { detail: total })); // Disparamos el evento personalizado con el total de la tirada
   });
   
