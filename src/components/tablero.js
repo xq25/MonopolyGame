@@ -1,9 +1,24 @@
-import { initCraps } from "./craps.js";
-
-const board = document.getElementById("board");
-export let boardData = {}; // Variable global exportada
+window.boardData = {}; // Variable global exportada
 const url = "http://127.0.0.1:5000/board";
-
+// Al inicio de tablero.js (antes de la definición de makeSquare) PINTAR CASILLA DEL COLOR DEL JUGADOR 
+window.updatePropertyState = function(propertyId, ownerColor) {
+  const square = document.getElementById(`square-${propertyId}`);
+  if (!square) return;
+  
+  const stateDiv = square.querySelector('.property-state');
+  if (!stateDiv) return;
+  
+  // Cambiar el color según el dueño (sin mostrar texto)
+  if (ownerColor) {
+    stateDiv.style.backgroundColor = ownerColor;
+    stateDiv.textContent = "";  // Sin texto, solo el color
+    stateDiv.style.height = "8px";  // Hacerlo más pequeño como un indicador de color
+  } else {
+    stateDiv.style.backgroundColor = "transparent";
+    stateDiv.style.color = "black";
+    stateDiv.style.height = "15px";  // Tamaño normal para cuando está disponible
+  }
+}
 function makeSquare(tile) { //creamos las casillas
   const div = document.createElement("div"); // creamos un div para estas en los bordes
   div.className = "square";
@@ -17,7 +32,6 @@ function makeSquare(tile) { //creamos las casillas
   // AÑADE ESTA LÍNEA: Agregar data-type como atributo separado
   if (tile.type) div.setAttribute('data-type', tile.type);
 
-  
   // ESTA ES LA LÍNEA CLAVE: toda la información en un solo atributo
   div.setAttribute('data-tile-info', JSON.stringify(tile));
   
@@ -26,6 +40,14 @@ function makeSquare(tile) { //creamos las casillas
     color.className = "color-bar";// le asignamos la clase
     color.style.background = tile.color;// le asignamos a la casilla el color que le corresponde(si tiene)
     div.appendChild(color);
+  }
+
+  // Estado de la propiedad (nuevo)
+  if (tile.type === "property" || tile.type === "railroad") {
+    const stateDiv = document.createElement("div");
+    stateDiv.className = "property-state";
+    stateDiv.textContent = ""; // Por defecto
+    div.appendChild(stateDiv);
   }
 
   const name = document.createElement("div");
@@ -87,19 +109,6 @@ fetch(url)
       });
     });
     //debemos colocar el evento de tablero ready para que se coloquen justo despues que las casillas se ccreen en el DOM
-    
-    // Pasar los datos a logicGame.js
-    // try {
-    //   import('./logicGame.js').then(module => {
-    //     if (typeof module.setBoardData === 'function') {
-    //       module.setBoardData(data);
-    //       console.log("Datos del tablero enviados a logicGame.js");
-    //     }
-    //   });
-    // } catch (error) {
-    //   console.error("Error al cargar módulo logicGame.js:", error);
-    // }
-    
     // Notificar que el tablero está listo
     document.dispatchEvent(new Event('boardReady'));
   })

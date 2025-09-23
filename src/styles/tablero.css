@@ -92,6 +92,12 @@ body {
   background: url("/src/assets/logo.png") no-repeat center/contain;
 }
 
+.property-state {
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
 /* Cambios para cuando se ve en celulares o pantallas pequeñas */
 @media (max-width: 600px) {
   .board {

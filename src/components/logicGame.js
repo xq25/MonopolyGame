@@ -3,8 +3,8 @@ import {initCraps} from '../components/craps.js'
 // Estructura para guardar los dueños de propiedades
 const propertyOwners = {}; // { 'idPropiedad': 'nombreJugador' }
 const endButton = document.getElementById('endGameBtn')//Boton para finalizar el juego manualmente
-// Variable para acceder a los datos del tablero
-let boardData = {};
+// Variable para acceder a los datos del tablero global para  no hacer importaciones  
+window.boardData = {};
 
 // Función para recibir los datos del tablero
 export function setBoardData(data) {
@@ -18,26 +18,27 @@ export function playGame(infoPlayers, tablero){
   const maxTurn = infoPlayers.length;
 
   initCraps();
-  document.addEventListener('diceRolled', (e) => { //Cada que se tiran los dados es porque se cambia el turno.
-    const numDice = e.detail;
-    if (infoPlayers[turn].active){
-      changePositionPlayer(numDice, infoPlayers[turn], tablero);
-      // Aquí puedes avanzar el turno, mostrar mensajes, etc.
-      
-      //Funciones Dany
+  document.addEventListener('diceRolled', (e) => {
+  const numDice = e.detail;
+  if (infoPlayers[turn].active){
+    changePositionPlayer(numDice, infoPlayers[turn], tablero);
 
-      //Manejo de los turnos
+    // Espera un pequeño instante antes de procesar la acción
+    setTimeout(() => {
+      const action = eventBox(infoPlayers[turn].position.toString(), infoPlayers[turn], infoPlayers);
+      processAction(action, infoPlayers, turn);
+
+      // Manejo de los turnos
       if (turn === maxTurn-1){
         turn = 0;
-      }else{
-        turn ++;
+      } else {
+        turn++;
       }
-      
-    } else {
-        // Acciones para que el usuario esté otra vez activo
-    }
-    
-  });  
+    }, 100); // 100 ms suele ser suficiente
+  } else {
+    // Acciones para que el usuario esté otra vez activo
+  }
+}); 
 }
 
 function changePositionPlayer(numDados, infoPlayer, tablero){
@@ -45,8 +46,11 @@ function changePositionPlayer(numDados, infoPlayer, tablero){
   let posPlayer = infoPlayer.position + numDados;
   if (posPlayer >= 40){
     posPlayer -= 40;
+    const goBonus = boardData.bottom.concat(boardData.left, boardData.top, boardData.right)
+        .find(tile => tile.id == 0)?.action?.money || 200; // Busca el bono en el JSON
+        infoPlayer.setMoney(infoPlayer.getMoney() + goBonus);
+        alert(`¡${infoPlayer.getNickName()} pasa por la salida y recibe $${goBonus}!`);
   } 
-
   infoPlayer.position = posPlayer;
 
   // Busca la casilla correspondiente usando el id generado en tablero.js
@@ -72,6 +76,7 @@ function changePositionPlayer(numDados, infoPlayer, tablero){
 
 // Función principal que determina qué acción realizar según la casilla
 function eventBox(numDice, currentPlayer, allPlayers) {
+
   // Buscar la casilla en el DOM
   const casilla = document.getElementById(`square-${numDice}`);// el id del html 
   if (!casilla) {
@@ -83,12 +88,8 @@ function eventBox(numDice, currentPlayer, allPlayers) {
   const tipo = casilla.getAttribute('data-type');
   let squareData = {}; // Almacenará los datos completos de la casilla
 
-  // Intentar obtener los datos completos de diferentes fuentes
-  if (window.MONOPOLY && window.MONOPOLY.squares && window.MONOPOLY.squares[numDice]) {
-    // Si existe el objeto global MONOPOLY con datos
-    squareData = window.MONOPOLY.squares[numDice];
-  } else if (boardData) 
-    
+  squareData = casilla.getAttribute('data-tile-info') ? JSON.parse(casilla.getAttribute('data-tile-info')) : {};
+
   // 1. CASILLAS TIPO PROPIEDAD
   if (tipo === 'property') {
     // Obtener datos básicos de la propiedad
@@ -158,6 +159,7 @@ function eventBox(numDice, currentPlayer, allPlayers) {
     }
     
     // Seleccionar una carta aleatoria
+    
     const randomIndex = Math.floor(Math.random() * cards.length);
     const card = cards[randomIndex];
     
@@ -172,6 +174,7 @@ function eventBox(numDice, currentPlayer, allPlayers) {
   else if (tipo === 'chance') {
     // Similar a la caja de comunidad
     let cards = boardData.chance || [];
+    console.log("Cartas de chance disponibles:", cards.map(c => c.description));
     if (cards.length === 0) {
       return {
         actionType: 'chance-card',
@@ -182,8 +185,10 @@ function eventBox(numDice, currentPlayer, allPlayers) {
     
     const randomIndex = Math.floor(Math.random() * cards.length);
     const card = cards[randomIndex];
+    console.log("Índice aleatorio:", randomIndex);
     
-    return {
+    
+    return {  
       actionType: 'chance-card',
       description: card.description || "Carta de suerte",
       money: card.action && card.action.money ? card.action.money : 0
@@ -196,7 +201,7 @@ function eventBox(numDice, currentPlayer, allPlayers) {
       case '0': // Casilla de Salida
         return {
           actionType: 'go',
-          bonus: 200 // Bonus por pasar por la casilla de salida
+           bonus: squareData.action?.money || 200 // Usa el valor del JSON o $200 por defecto
         };
       case '10': // Visita a la cárcel
         return {
@@ -319,8 +324,8 @@ export function loadPlayerInteface(objectPlayer){
     let divInfoPlayer = document.createElement('div');
     // Construimos las options del select a partir de objectPlayer.propierties
     //Cada prop es el id de la propiedad
-    const optionsPropierties = objectPlayer.propierties && objectPlayer.propierties.length > 0? objectPlayer.propierties.map(prop => `<option value="${prop}">${getInfoElementHtml(prop).name}</option>`).join(""): `<option disabled>No hay propiedades</option>`;
-    const optionsMortgages = objectPlayer.mortgages && objectPlayer.mortgages.length > 0? objectPlayer.mortgages.map(mort => `<option value="${mort}">${getInfoElementHtml(mort)}</option>`).join(""): `<option disabled>No hay Hipotecas</option>`;
+    const optionsPropierties = objectPlayer.propierties && objectPlayer.propierties.length > 0? objectPlayer.propierties.map(prop => `<option value="${prop}">${prop}</option>`).join(""): `<option disabled>No hay propiedades</option>`;
+    // const optionsMortgages = objectPlayer.mortgages && objectPlayer.mortgages.length > 0? objectPlayer.mortgages.map(mort => `<option value="${mort}">${getInfoElementHtml(mort)}</option>`).join(""): `<option disabled>No hay Hipotecas</option>`;
     // const optionLoans = objectPlayer.loans && objectPlayer.loans.length > 0? //Implementar la logica de loss prestamo
       
     divInfoPlayer.id = `player-${objectPlayer.color}`; //Asignamos el id correspondiente a cada jugar. Esta clase es la que indicara su posicion en la pantalla y las diferencias de colores.
@@ -337,14 +342,6 @@ export function loadPlayerInteface(objectPlayer){
         <select class="properties-select">
           <option value="" selected hidden>Propiedades</option>
           ${optionsPropierties}
-        </select>
-        <select class="properties-select">
-          <option value="" selected hidden>Hipotecas</option>
-          ${optionsMortgages}
-        </select>
-        <select class="properties-select">
-          <option value="" selected hidden>prestamos</option>
-          ${optionsMortgages}
         </select>
       </div>
     `;
@@ -377,9 +374,154 @@ function endGameBrokeCondition(infoPlayers){
   return endGameCondition;
 }
 
-function getInfoElementHtml(idElement){
-  const infoObject = JSON.parse(document.getElementById(idElement).getAttribute('data-tile-info')) || {};
-  return infoObject;
+// function getInfoElementHtml(idElement){
+//   console.log(idElement)
+//   const infoObject = JSON.parse(document.getElementById(idElement).getAttribute('data-tile-info')) || {};
+//   return infoObject;
+// }
+
+
+function buildHouseOrHotel(propertyId, player) {
+  const property = boardData.bottom.concat(boardData.left, boardData.top, boardData.right)
+    .find(tile => tile.id == propertyId);
+
+  if (!property) {
+    alert("No se encontró la propiedad.");
+    return;
+  }
+
+  // Verificar si el jugador posee todas las propiedades del mismo color
+  const sameColorProperties = boardData.bottom.concat(boardData.left, boardData.top, boardData.right)
+    .filter(tile => tile.color === property.color);
+  const ownsAll = sameColorProperties.every(tile => propertyOwners[tile.id] === player.getNickName());
+
+  if (!ownsAll) {
+    alert("Debes poseer todas las propiedades del mismo color para construir.");
+    return;
+  }
+
+  // Construir casas o hotel
+  if (!property.houses) property.houses = 0;
+  if (property.houses < 4) {
+    property.houses++;
+    player.setMoney(player.getMoney() - 100); // Cada casa cuesta $100
+    property.rent.base = property.rent.withHouse[property.houses - 1]; // Actualizar la renta
+    alert(`Has construido una casa en ${property.name}. Ahora tiene ${property.houses} casas. La renta es de $${property.rent.base}.`);
+  } else if (!property.hotel) {
+    property.hotel = true;
+    property.houses = 0; // Reemplaza las casas por un hotel
+    player.setMoney(player.getMoney() - 250); // El hotel cuesta $250
+    property.rent.base = property.rent.withHotel; // Actualizar la renta
+    alert(`Has construido un hotel en ${property.name}. La renta ahora es de $${property.rent.base}.`);
+    console.log(`Propiedad ${property.name} ahora tiene ${property.houses} casas y hotel: ${property.hotel}`);
+    console.log(`Nueva renta: $${property.rent.base}`);
+  } else {
+    alert("Ya tienes un hotel en esta propiedad.");
+  }
+
+  // Actualizar visualmente la propiedad
+  window.updatePropertyState(propertyId, player.getColor());
 }
+/**
+ * Procesa una acción generada por eventBox
+ * @param {Object} action - La acción devuelta por eventBox
+ * @param {Array} infoPlayers - Lista de jugadores
+ * @param {number} turn - Índice del jugador actual
+ */
+function processAction(action, infoPlayers, turn) {
+  // Si no hay acción (objeto vacío) no hacemos nada
+  if (!action || Object.keys(action).length === 0) {
+    return;
+  }
+  
+  // Procesamos según el tipo de acción
+  switch(action.actionType) {
+    // COMPRAR PROPIEDADES
+    case 'buy-property':
+    case 'buy-railroad':
+      // Preguntar si quiere comprar
+      const wantToBuy = confirm(`¿Quieres comprar ${action.name} por $${action.price}?`);
+      if (wantToBuy && infoPlayers[turn].getMoney() >= action.price) {
+        
+        // Restar dinero
+        infoPlayers[turn].setMoney(infoPlayers[turn].getMoney() - action.price);
+        //pintar la casilla del color del jugador
+         //  LÍNEA PARA ACTUALIZAR LA CASILLA
+         window.updatePropertyState(
+        action.propertyId || action.railroadId, 
+        infoPlayers[turn].getColor(), 
+        );
+        // Registrar propiedad como comprada
+        propertyOwners[action.propertyId || action.railroadId ] = infoPlayers[turn].getNickName();
+        // Agregar a la lista de propiedades del jugador (si no existe la creamos)
+        if (!infoPlayers[turn].propierties) {
+          infoPlayers[turn].propierties = [];
+        }
+        infoPlayers[turn].propierties.push(action.propertyId || action.railroadId );
+        alert(`¡Has comprado ${action.name}!`);
+      }
+      break;
+    
+    // PAGAR RENTA
+   case 'pay-rent':
+   case 'pay-railroad-rent':
+    const owner = infoPlayers.find(p => p.getNickName() === action.ownerId);
+    if (owner) {
+    // Buscar la propiedad en boardData y usar la renta actualizada
+    const property = boardData.bottom.concat(boardData.left, boardData.top, boardData.right)
+      .find(tile => tile.id == action.propertyId);
+    const rentAmount = property?.rent.base || 0;
 
+    infoPlayers[turn].setMoney(infoPlayers[turn].getMoney() - rentAmount);
+    owner.setMoney(owner.getMoney() + rentAmount);
+    alert(`Pagas $${rentAmount} de renta a ${action.ownerId} por ${action.name}`);
+    console.log(`Jugador ${infoPlayers[turn].getNickName()} paga $${rentAmount} a ${action.ownerId}`);
+    loadPlayerInteface(owner);
+   }
+   break;
+    
+    // CARTAS
+    case 'community-card':
+    case 'chance-card':
+      alert(`${action.description}`);
+      if (action.money !== 0) {
+        // Modificar dinero según la carta
+        infoPlayers[turn].setMoney(infoPlayers[turn].getMoney() + action.money);
+        if (action.money > 0) {
+          alert(`Recibes $${action.money}`);
+        } else {
+          alert(`Pagas $${Math.abs(action.money)}`);
+        }
+      }
+      break;
+    
+    // IR A LA CÁRCEL
+    case 'go-to-jail':
+      infoPlayers[turn].position = action.destination;
+      alert("¡Vas a la cárcel!");
+      infoPlayers[turn].active = false; // El jugador pierde su próximo turno
+      break;
+    
+    // PAGAR IMPUESTO
+    case 'pay-tax':
+      infoPlayers[turn].setMoney(infoPlayers[turn].getMoney() - action.amount);
+      alert(`Pagas $${action.amount} de ${action.name}`);
+      break;
 
+    // PASAR POR LA SALIDA
+    case 'go':
+      infoPlayers[turn].setMoney(infoPlayers[turn].getMoney() + action.bonus);
+      alert(`¡Pasas por la salida y recibes $${action.bonus}!`);
+      break;
+
+    case 'own-property':
+      const canBuild = confirm(`¿Quieres construir en ${action.name}?`);
+      if (canBuild) {
+      buildHouseOrHotel(action.propertyId, infoPlayers[turn]);
+  }
+  break;
+  }
+  
+  // Actualizar interfaz después de la acción
+  loadPlayerInteface(infoPlayers[turn]);
+}
