@@ -324,46 +324,57 @@ export function initializePlayersClass(playersList){
 }
 
 //Esta funcion nos permite cargar la informacion de cada jugador. Vamos a reutilizarla al detectar cambios a medida que pasa el juego.
-export function loadPlayerInteface(objectPlayer){
+export function loadPlayerInteface(objectPlayer) {
+  if (!objectPlayer) return;
 
-  if (objectPlayer){
+  const gameDiv = document.getElementById('gameDiv');
+  // Buscamos si ya existe la interfaz para este jugador
+  let divInfoPlayer = document.getElementById(`player-${objectPlayer.color}`);
 
-    const gameDiv = document.getElementById('gameDiv');
-    
-    let divInfoPlayer = document.createElement('div');
-    // Construimos las options del select a partir de objectPlayer.propierties
-    //Cada prop es el id de la propiedad
-    const optionsPropierties = objectPlayer.propierties && objectPlayer.propierties.length > 0? objectPlayer.propierties.map(prop => `<option value="${prop}">${prop}</option>`).join(""): `<option disabled>No hay propiedades</option>`;
-    // const optionsMortgages = objectPlayer.mortgages && objectPlayer.mortgages.length > 0? objectPlayer.mortgages.map(mort => `<option value="${mort}">${getInfoElementHtml(mort)}</option>`).join(""): `<option disabled>No hay Hipotecas</option>`;
-    // const optionLoans = objectPlayer.loans && objectPlayer.loans.length > 0? //Implementar la logica de loss prestamo
-      
-    divInfoPlayer.id = `player-${objectPlayer.color}`; //Asignamos el id correspondiente a cada jugar. Esta clase es la que indicara su posicion en la pantalla y las diferencias de colores.
-    divInfoPlayer.classList.add('playerInterface'); //Esta es la clase general que genera el recuadro con el mismo tamaño para todos.
-    divInfoPlayer.innerHTML = `
-      <h2 class="player-header">
-        <img src="https://flagsapi.com/${objectPlayer.country.toUpperCase()}/flat/64.png" 
-             alt="Bandera-${objectPlayer.country}" 
-             class="flag">
-        ${objectPlayer.nick_name}
-      </h2>
-      <div class="player-content">
-        <p class="money-text"><strong>Dinero :</strong> $${objectPlayer.money}</p>
-        <select class="properties-select">
-          <option value="" selected hidden>Propiedades</option>
-          ${optionsPropierties}
-        </select>
-      </div>
-    `;
-    gameDiv.appendChild(divInfoPlayer); //Agregamos cada recuadro a nuestra visualizacion del juego.
+  // Construimos las options del select a partir de objectPlayer.propierties
+  const optionsPropierties =
+    objectPlayer.propierties && objectPlayer.propierties.length > 0
+      ? objectPlayer.propierties.map(
+          (prop) => `<option value="${prop}">${prop}</option>`
+        ).join("")
+      : `<option disabled>No hay propiedades</option>`;
 
-    //Sacamos loss elementos que necesitamos para poder aplicar la logica de desplegar y esconder la interfaz.
-    const header = divInfoPlayer.querySelector('.player-header');
-    const contentPlayerInterface = divInfoPlayer.querySelector('.player-content');
-
-    header.addEventListener('click', () => {
-      contentPlayerInterface.classList.toggle('collapsed');
-    });
+  // Si no existe, lo creamos y lo agregamos al DOM
+  if (!divInfoPlayer) {
+    divInfoPlayer = document.createElement('div');
+    divInfoPlayer.id = `player-${objectPlayer.color}`;
+    divInfoPlayer.classList.add('playerInterface');
+    gameDiv.appendChild(divInfoPlayer);
   }
+
+  // Actualizamos su contenido (esto sobreescribe si ya existía)
+  divInfoPlayer.innerHTML = `
+    <h2 class="player-header">
+      <img src="https://flagsapi.com/${objectPlayer.country.toUpperCase()}/flat/64.png" 
+           alt="Bandera-${objectPlayer.country}" 
+           class="flag">
+      ${objectPlayer.nick_name}
+    </h2>
+    <div class="player-content">
+      <p class="money-text"><strong>Dinero :</strong> $${objectPlayer.money}</p>
+      <select class="properties-select">
+        <option value="" selected hidden>Propiedades</option>
+        ${optionsPropierties}
+      </select>
+    </div>
+  `;
+
+  // Reasignamos el evento al header
+  const header = divInfoPlayer.querySelector('.player-header');
+  const contentPlayerInterface = divInfoPlayer.querySelector('.player-content');
+
+  // Eliminamos listeners anteriores para evitar duplicados
+  header.onclick = null;
+
+  // Añadimos el toggle para mostrar/ocultar contenido
+  header.addEventListener('click', () => {
+    contentPlayerInterface.classList.toggle('collapsed');
+  });
 }
 
 function endGameBrokeCondition(infoPlayers){
