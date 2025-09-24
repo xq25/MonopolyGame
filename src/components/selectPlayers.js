@@ -183,7 +183,7 @@ Sin el IIFE, podrías tener problemas si el script se carga antes de que el HTML
         });
         if(infoPlayers.length === activeForms){ //Validamos que todos los formularios activos esten bien diligenciados para empezar el juego.
             //Creamos e invocamos un customEvent que va a ser escuchado desde nuestro index, en el cual pasaremos la informacion de los usuarios para empezar a trabajarla desde alli.
-            document.dispatchEvent(new CustomEvent('playersReady', {detail: infoPlayers }));
+            document.dispatchEvent(new CustomEvent('playersReady', {detail: infoPlayers}));
         }
 
         //Se podria mostrar un mensaje de alerta general para que se revise bien los formularios y captar la atencion sobre los campos sin diligenciar.

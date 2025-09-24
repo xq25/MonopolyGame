@@ -20,34 +20,40 @@ export function playGame(infoPlayers, tablero){
 
   initCraps();
   if(popup){ popup.style.display = "block"; }
+
+  document.addEventListener('mortgagePropiertie', (e) => { //estamos a la escucha del evento si se hipoteca una casa para ejecutar la funcion de forma independiente. (Esto lo podemos hacer ya que la propia funcion refresca la interfaz del usuario)
+    console.log('entre')
+    mortgagePropiertie(e.detail[0],e.detail[1]);
+  });
+
   document.addEventListener('diceRolled', (e) => {
-  const numDice = e.detail;
-  setTimeout(() => {
-      if(popup) popup.style.display = "none";
-    }, 1500);
-  if (infoPlayers[turn].active){
-    changePositionPlayer(numDice, infoPlayers[turn], tablero);
-
-    // Espera un pequeño instante antes de procesar la acción
+    const numDice = e.detail;
     setTimeout(() => {
-      const action = eventBox(infoPlayers[turn].position.toString(), infoPlayers[turn], infoPlayers);
-      processAction(action, infoPlayers, turn);
+        if(popup) popup.style.display = "none";
+      }, 1500);
+    if (infoPlayers[turn].active){
+      changePositionPlayer(numDice, infoPlayers[turn], tablero);
 
-      // Manejo de los turnos
-      if (turn === maxTurn-1){
-        turn = 0;
-      } else {
-        turn++;
-      }
-    }, 100); 
-    setTimeout(() => {
-      if(popup) popup.style.display = "block";
-    }, 3000);
-  } 
-  else {
-    // Acciones para que el usuario esté otra vez activo
-  }
-}); 
+      // Espera un pequeño instante antes de procesar la acción
+      setTimeout(() => {
+        const action = eventBox(infoPlayers[turn].position.toString(), infoPlayers[turn], infoPlayers);
+        processAction(action, infoPlayers, turn);
+
+        // Manejo de los turnos
+        if (turn === maxTurn-1){
+          turn = 0;
+        } else {
+          turn++;
+        }
+      }, 100); 
+      setTimeout(() => {
+        if(popup) popup.style.display = "block";
+      }, 3000);
+    } 
+    else {
+      // Acciones para que el usuario esté otra vez activo
+    }
+  }); 
 }
 
 function changePositionPlayer(numDados, infoPlayer, tablero){
@@ -71,7 +77,7 @@ function changePositionPlayer(numDados, infoPlayer, tablero){
 
   // Elimina el token anterior si existe
   const oldToken = tablero.querySelector(`#token-${infoPlayer.color}`);
-  console.log(oldToken)
+
   if (oldToken){
       oldToken.remove();
   }
@@ -334,10 +340,19 @@ export function loadPlayerInteface(objectPlayer) {
   // Construimos las options del select a partir de objectPlayer.propierties
   const optionsPropierties =
     objectPlayer.propierties && objectPlayer.propierties.length > 0
-      ? objectPlayer.propierties.map(
-          (prop) => `<option value="${prop}">${prop}</option>`
-        ).join("")
+      ? objectPlayer.propierties.map(prop => {
+          const name = getInfoElementHtml(prop).name;
+          const isMortgaged = objectPlayer.mortgages.includes(prop); // 👈 validación si la propiedad esta hipotecada para no volver a hipotecarla
+          return `<option value="${prop}" ${isMortgaged ? 'disabled' : ''}>${name}</option>`;
+        }).join("")
       : `<option disabled>No hay propiedades</option>`;
+
+
+  const optionMortgage = objectPlayer.mortgages && objectPlayer.mortgages.length > 0
+      ? objectPlayer.mortgages.map(
+          (mort) => `<option value="${mort}">${getInfoElementHtml(mort).name} </option>`  //Prop es el id que referencia la propiedad de la cual somos dueños.
+        ).join("")
+      : `<option disabled>No hay hipotecas</option>`;
 
   // Si no existe, lo creamos y lo agregamos al DOM
   if (!divInfoPlayer) {
@@ -347,7 +362,7 @@ export function loadPlayerInteface(objectPlayer) {
     gameDiv.appendChild(divInfoPlayer);
   }
 
-  // Actualizamos su contenido (esto sobreescribe si ya existía)
+  // Actualizamos su contenido (esto sobreescribe si ya existía) --> Aqui esta la inyeccion de la interface en cada recuadro
   divInfoPlayer.innerHTML = `
     <h2 class="player-header">
       <img src="https://flagsapi.com/${objectPlayer.country.toUpperCase()}/flat/64.png" 
@@ -361,6 +376,12 @@ export function loadPlayerInteface(objectPlayer) {
         <option value="" selected hidden>Propiedades</option>
         ${optionsPropierties}
       </select>
+      <button class="btn-interface" id="mortgage-${objectPlayer.color}">Hipotecar</button>
+      <select class="properties-select">
+        <option value="" selected hidden>Hipotecas</option>
+        ${optionMortgage}
+      </select>
+      <button class="btn-interface" id="unMortgage-${objectPlayer.color}">DesHipotecar</button>
     </div>
   `;
 
@@ -368,12 +389,29 @@ export function loadPlayerInteface(objectPlayer) {
   const header = divInfoPlayer.querySelector('.player-header');
   const contentPlayerInterface = divInfoPlayer.querySelector('.player-content');
 
+  const mortgageBtn = divInfoPlayer.querySelector(`#mortgage-${objectPlayer.color}`);
+  const propertiesSelect = mortgageBtn.previousElementSibling; // el select de propiedades.
+
   // Eliminamos listeners anteriores para evitar duplicados
   header.onclick = null;
 
   // Añadimos el toggle para mostrar/ocultar contenido
   header.addEventListener('click', () => {
     contentPlayerInterface.classList.toggle('collapsed');
+  });
+
+  mortgageBtn.addEventListener('click', () => {
+    // aquí obtienes la propiedad seleccionada
+    const selectedPropertyId = propertiesSelect.value;
+
+    if (!selectedPropertyId) {
+      alert('Selecciona una propiedad antes de hipotecar');
+      return;
+    }
+
+    // Aquí ya puedes hacer tu acción específica
+    document.dispatchEvent(new CustomEvent ('mortgagePropiertie', {detail : [selectedPropertyId, objectPlayer]}));
+  
   });
 }
 
@@ -393,12 +431,15 @@ function endGameBrokeCondition(infoPlayers){
 
   return endGameCondition;
 }
-
-// function getInfoElementHtml(idElement){
-//   console.log(idElement)
-//   const infoObject = JSON.parse(document.getElementById(idElement).getAttribute('data-tile-info')) || {};
-//   return infoObject;
-// }
+/**
+ * Devuelve Informacion de Una Casilla Mediante su ID.
+ * @param {number} idElement - ID Casilla Especifica.
+ * @returns {object} - Informacion Completa de la Casilla.
+ */
+function getInfoElementHtml(idElement){
+  const infoObject = JSON.parse(document.getElementById(`square-${idElement}`).getAttribute('data-tile-info')) || {};
+  return infoObject;
+}
 
 
 function buildHouseOrHotel(propertyId, player) {
@@ -441,6 +482,15 @@ function buildHouseOrHotel(propertyId, player) {
 
   // Actualizar visualmente la propiedad
   window.updatePropertyState(propertyId, player.getColor());
+}
+
+function mortgagePropiertie(idPropiertieMortgage, currentPlayer){
+  const propInfo = getInfoElementHtml(idPropiertieMortgage);
+  if (propInfo){
+    currentPlayer.mortgages.push(idPropiertieMortgage); //Agregamos el id de la propiedad hipotecada (Esto ya que nuestra funcion loadPlayerInterface analiza este id y obtiene el nombre para mostrarlo)
+    currentPlayer.money += propInfo.mortgage;
+  }
+  loadPlayerInteface(currentPlayer);
 }
 /**
  * Procesa una acción generada por eventBox
