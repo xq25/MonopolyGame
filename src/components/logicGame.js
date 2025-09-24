@@ -23,14 +23,14 @@ export function playGame(infoPlayers, tablero){
   initCraps();
   if(popup){ popup.style.display = "block"; }
 
-  document.addEventListener('mortgagePropiertie', (e) => { //estamos a la escucha del evento si se hipoteca una casa para ejecutar la funcion de forma independiente. (Esto lo podemos hacer ya que la propia funcion refresca la interfaz del usuario)
-    mortgagePropiertie(e.detail[0],e.detail[1]);
+  document.addEventListener('mortgagepropertie', (e) => { //estamos a la escucha del evento si se hipoteca una casa para ejecutar la funcion de forma independiente. (Esto lo podemos hacer ya que la propia funcion refresca la interfaz del usuario)
+    mortgagepropertie(e.detail[0],e.detail[1]);
   });
-
-  document.addEventListener('unMortgagePropiertie', (e) => {
+  console.log(window.boardData);
+  document.addEventListener('unMortgagepropertie', (e) => {
 
     if (turnValidation(turn, infoPlayers, e.detail[1].color, maxTurn)){
-      unMortgagePropiertie(e.detail[0], e.detail[1]);
+      unMortgagepropertie(e.detail[0], e.detail[1]);
     }
     else{
       alert('No puedes Deshipotecar propiedades fuera de tu turno');
@@ -78,6 +78,7 @@ export function playGame(infoPlayers, tablero){
         if(popup) popup.style.display = "block";
       }, 3000);
   }); 
+  
 }
 
 function changePositionPlayer(numDados, infoPlayer, tablero){
@@ -361,10 +362,10 @@ export function loadPlayerInteface(objectPlayer) {
   // Buscamos si ya existe la interfaz para este jugador
   let divInfoPlayer = document.getElementById(`player-${objectPlayer.color}`);
 
-  // Construimos las options del select a partir de objectPlayer.propierties
-  const optionsPropierties =
-    objectPlayer.propierties && objectPlayer.propierties.length > 0
-      ? objectPlayer.propierties.map(prop => {
+  // Construimos las options del select a partir de objectPlayer.properties
+  const optionsproperties =
+    objectPlayer.properties && objectPlayer.properties.length > 0
+      ? objectPlayer.properties.map(prop => {
           const name = getInfoElementHtml(prop).name;
           const isMortgaged = objectPlayer.mortgages.includes(prop); // 👈 validación si la propiedad esta hipotecada para no volver a hipotecarla
           return `<option value="${prop}" ${isMortgaged ? 'disabled' : ''}>${name}</option>`;
@@ -398,7 +399,7 @@ export function loadPlayerInteface(objectPlayer) {
       <p class="money-text"><strong>Dinero :</strong> $${objectPlayer.money}</p>
       <select class="properties-select">
         <option value="" selected hidden>Propiedades</option>
-        ${optionsPropierties}
+        ${optionsproperties}
       </select>
       <button class="btn-interface" id="mortgage-${objectPlayer.color}">Hipotecar</button>
       <select class="properties-select">
@@ -437,7 +438,7 @@ export function loadPlayerInteface(objectPlayer) {
     }
 
     // Aquí ya puedes hacer tu acción específica
-    document.dispatchEvent(new CustomEvent ('mortgagePropiertie', {detail : [selectedPropertyId, objectPlayer]}));
+    document.dispatchEvent(new CustomEvent ('mortgagepropertie', {detail : [selectedPropertyId, objectPlayer]}));
   
   });
   // 🔹 DESHIPOTECAR
@@ -449,7 +450,7 @@ export function loadPlayerInteface(objectPlayer) {
     }
 
     document.dispatchEvent(
-      new CustomEvent('unMortgagePropiertie', { detail: [selectedMortgageId, objectPlayer] })
+      new CustomEvent('unMortgagepropertie', { detail: [selectedMortgageId, objectPlayer] })
     );
   });
 }
@@ -460,7 +461,7 @@ function endGameBrokeCondition(infoPlayers){
   let endGameCondition = false;
 
   infoPlayers.forEach(player => {
-      if (player.money <= 0 && player.propierties.length === 0){
+      if (player.money <= 0 && player.properties.length === 0){
         playersBroke.push(player);
       }  
   });
@@ -522,20 +523,20 @@ function buildHouseOrHotel(propertyId, player) {
   window.updatePropertyState(propertyId, player.getColor());
 }
 
-function mortgagePropiertie(idPropiertieMortgage, currentPlayer){
-  const propInfo = getInfoElementHtml(idPropiertieMortgage);
+function mortgagepropertie(idpropertieMortgage, currentPlayer){
+  const propInfo = getInfoElementHtml(idpropertieMortgage);
   if (propInfo){
-    currentPlayer.mortgages.push(idPropiertieMortgage); //Agregamos el id de la propiedad hipotecada (Esto ya que nuestra funcion loadPlayerInterface analiza este id y obtiene el nombre para mostrarlo)
+    currentPlayer.mortgages.push(idpropertieMortgage); //Agregamos el id de la propiedad hipotecada (Esto ya que nuestra funcion loadPlayerInterface analiza este id y obtiene el nombre para mostrarlo)
     currentPlayer.money += propInfo.mortgage;
   }
   loadPlayerInteface(currentPlayer);
 }
 
-function unMortgagePropiertie(idPropiertieUnMortgage, currentPlayer){
-  const deletedIndex = currentPlayer.mortgages.indexOf(`${idPropiertieUnMortgage}`);
+function unMortgagepropertie(idpropertieUnMortgage, currentPlayer){
+  const deletedIndex = currentPlayer.mortgages.indexOf(`${idpropertieUnMortgage}`);
   
   if (deletedIndex !== -1){
-    const mortgageInfo = getInfoElementHtml(idPropiertieUnMortgage);
+    const mortgageInfo = getInfoElementHtml(idpropertieUnMortgage);
     currentPlayer.mortgages.splice(deletedIndex,1);
     currentPlayer.money -= (mortgageInfo.mortgage) * 1.1
     loadPlayerInteface(currentPlayer);
@@ -576,10 +577,10 @@ function processAction(action, infoPlayers, turn) {
         // Registrar propiedad como comprada
         propertyOwners[action.propertyId || action.railroadId ] = infoPlayers[turn].getNickName();
         // Agregar a la lista de propiedades del jugador (si no existe la creamos)
-        if (!infoPlayers[turn].propierties) {
-          infoPlayers[turn].propierties = [];
+        if (!infoPlayers[turn].properties) {
+          infoPlayers[turn].properties = [];
         }
-        infoPlayers[turn].propierties.push(action.propertyId || action.railroadId );
+        infoPlayers[turn].properties.push(action.propertyId || action.railroadId );
         alert(`¡Has comprado ${action.name}!`);
       }
       break;
@@ -659,4 +660,37 @@ function turnValidation (turn, infoPlayers, colorPlayerTurn, maxTurn){
     validation = true;
   }
   return validation;
+}
+
+function finalScores(playersList){
+  scoresList = [];
+  playersList.forEach(player => {
+    let scorePlayer = 0;
+    scorePlayer += player.money;
+    let propertiesPlayer = player.properties;
+    let mortgagesPlayer = player.mortgages;
+    
+    propertiesPlayer.forEach(prop => {
+      if (!mortgagesPlayer.includes(prop)){
+        const infoProp = getInfoElementHtml(prop);
+        let propertieScore = 0;
+        propertieScore += infoProp.price;
+        propertieScore += (infoProp.amountHouses * 100);
+        propertieScore += (infoProp.amountHouses * 200);
+        scorePlayer += propertieScore;
+      }
+    });
+    scoresList.push({'nick_name': player.nick_name, 'score' : scorePlayer, 'country_code' : player.country })
+  });
+  return scoresList
+}
+
+function endGame(scoreList){
+  scoreList.forEach(scorePlayer => {
+    fetch('http://127.0.0.1/score-recorder',{
+      method : 'POST',
+      body : JSON.stringify(scorePlayer)
+    })
+  });
+    
 }

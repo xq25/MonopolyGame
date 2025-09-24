@@ -6,7 +6,7 @@ export class Player {
         this.money = 1500;
         this.active = true;
         this.position = 0; // Posicion inicial del player.
-        this.propierties = []; //Aqui se guarda el id de la propiedad de la cual es dueño.
+        this.properties = []; //Aqui se guarda el id de la propiedad de la cual es dueño.
         this.mortgages = []; // Esto esta directamente relacionado con los prestamos.
     }
     //Accesores y mutadores de la clase.
