@@ -20,6 +20,12 @@ window.updatePropertyState = function(propertyId, ownerColor) {
   }
 }
 function makeSquare(tile) { //creamos las casillas
+   // Asegurar las nuevas keys dentro del objeto (solo para type 'property')
+  if (tile.type === 'property') {
+    if (typeof tile.amountHouses !== 'number') tile.amountHouses = 0;
+    if (typeof tile.amountHotels !== 'number') tile.amountHotels = 0;
+  }
+
   const div = document.createElement("div"); // creamos un div para estas en los bordes
   div.className = "square";
   
@@ -47,6 +53,14 @@ function makeSquare(tile) { //creamos las casillas
     const stateDiv = document.createElement("div");
     stateDiv.className = "property-state";
     stateDiv.textContent = ""; // Por defecto
+    div.appendChild(stateDiv);
+  }
+
+  // Indicador de estado (dueño / hipotecada / etc.) para propiedades y ferrocarriles
+  if (tile.type === "property" || tile.type === "railroad") {
+    const stateDiv = document.createElement("div");
+    stateDiv.className = "property-state";
+    stateDiv.textContent = "";
     div.appendChild(stateDiv);
   }
 
