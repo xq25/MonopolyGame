@@ -37,6 +37,25 @@ export function playGame(infoPlayers, tablero){
   initCraps();
   if (popup) popup.style.display = "block";
 
+  // 🔹 Crear botón Finalizar juego si no existe aún
+  let endGameBtn = document.getElementById('endGameBtn');
+  if (!endGameBtn) {
+    endGameBtn = document.createElement('button');
+    endGameBtn.id = 'endGameBtn';
+    endGameBtn.textContent = 'Finalizar';
+    endGameBtn.classList.add('btn-interface'); // reutiliza tu estilo de botones
+    // añade el botón donde prefieras (ej: en body o popup)
+    document.body.appendChild(endGameBtn);
+
+    // Aquí defines lo que hace al hacer clic:
+    endGameBtn.addEventListener('click', () => {
+      // Acción al finalizar juego
+      alert('Juego finalizado');
+      // aquí podrías limpiar listeners, resetear variables, etc.
+    });
+  }
+
+
   document.addEventListener('mortgagepropertie', (e) => { //estamos a la escucha del evento si se hipoteca una casa para ejecutar la funcion de forma independiente. (Esto lo podemos hacer ya que la propia funcion refresca la interfaz del usuario)
     mortgagepropertie(e.detail[0],e.detail[1]);
   });
