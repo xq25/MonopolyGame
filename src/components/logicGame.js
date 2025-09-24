@@ -63,13 +63,20 @@ export function playGame(infoPlayers, tablero){
         }
       }, 100); 
 
-      setTimeout(() => {
-        if(popup) popup.style.display = "block";
-      }, 3000);
+      
     } 
+    
     else {
       // Acciones para que el usuario esté otra vez activo
+      if (turn === maxTurn-1){
+          turn = 0;
+        } else {
+          turn++;
+        }
     }
+    setTimeout(() => {
+        if(popup) popup.style.display = "block";
+      }, 3000);
   }); 
 }
 
