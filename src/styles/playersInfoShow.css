@@ -173,16 +173,58 @@
   background-color: rgba(255,255,255,0.1);
   color: #fff;
   outline: none;
-  margin-bottom: 10px;
+  white-space: nowrap;      /* no cortar líneas */
+  overflow-x: auto;     
 }
 
 /* Para cambiar el color de las opciones */
 .playerInterface .properties-select option {
   color: #000; /* texto negro dentro del desplegable */
+  white-space: nowrap;       /* no cortar texto */
+  display: inline-block;     /* para respetar ancho */
+  min-width: 200px;          /* ancho mínimo (ajústalo a gusto) */
 }
+
+
+/* --- BOTÓNES Dentro de Nuestra interface --- */
+.playerInterface .btn-interface {
+  display: inline-block;
+  width: 100%;
+  padding: 6px 12px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  text-align: center;
+  color: #efeb0c;
+  background: rgba(255, 255, 255, 0.582); /* Transparente suave */
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
+  margin-top: 2px;
+  margin-bottom: 7px;
+}
+
+.playerInterface .btn-interface:hover {
+  background: rgba(255, 255, 255, 0.3); /* Más claro al pasar mouse */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  transform: scale(1.02);
+}
+
+.playerInterface .btn-interface:active {
+  transform: scale(0.98);
+  background: rgba(255, 255, 255, 0.4);
+}
+
 @media(min-width: 992px){
   .playerInterface{
     width: 25%;
+  }
+  .playerInterface .properties-select{
+    width: 75%;
+  }
+  .playerInterface .btn-interface{
+    width: 23%
   }
 }
 .board{

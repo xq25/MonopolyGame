@@ -11,6 +11,7 @@ const rulesButton = document.getElementById("rulesButton"); // boton rules del H
 const playButton = document.getElementById("playButton"); // boton play del Home
 const content = document.getElementById("content"); // el div donde se quiere cargar el contenido
 const rankButton = document.getElementById("rankButton"); // boton rank del Home
+
 // Cargar el contenido inicial (por defecto cargamos la introduccion del juego)
 function initializeHomePage() {
     loadContent(content); // Carga la introducción del juego por defecto
@@ -20,6 +21,7 @@ function initializeHomePage() {
     rankButton.addEventListener("click", () => loadContent(content, "./pages/ranking.html").then(() => {
         cargarRanking();
     }));
+    changeSidebar(); //Metemos toda la logica de manejo del sideBar
 }
 function initializeSelectPlayers(){
     loadContent(mainContainer, "/src/pages/selectPlayers.html").then(() => {
@@ -34,7 +36,7 @@ function initializeSelectPlayers(){
 }
 document.addEventListener("DOMContentLoaded", () => {
     initializeHomePage();
-    changeSidebar();
+    
     playButton.addEventListener("click", () => {
         initializeSelectPlayers();
     });
