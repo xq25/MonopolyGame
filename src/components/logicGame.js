@@ -1,8 +1,10 @@
 import { Player } from '../model/players.js'
 import {initCraps} from '../components/craps.js'
+
 // Estructura para guardar los dueños de propiedades
 const propertyOwners = {}; // { 'idPropiedad': 'nombreJugador' }
 const endButton = document.getElementById('endGameBtn')//Boton para finalizar el juego manualmente
+
 // Variable para acceder a los datos del tablero global para  no hacer importaciones  
 window.boardData = {};
 
@@ -22,22 +24,36 @@ export function playGame(infoPlayers, tablero){
   if(popup){ popup.style.display = "block"; }
 
   document.addEventListener('mortgagePropiertie', (e) => { //estamos a la escucha del evento si se hipoteca una casa para ejecutar la funcion de forma independiente. (Esto lo podemos hacer ya que la propia funcion refresca la interfaz del usuario)
-    console.log('entre')
     mortgagePropiertie(e.detail[0],e.detail[1]);
   });
 
-  document.addEventListener('diceRolled', (e) => {
-    const numDice = e.detail;
+  document.addEventListener('unMortgagePropiertie', (e) => {
+
+    if (turnValidation(turn, infoPlayers, e.detail[1].color, maxTurn)){
+      unMortgagePropiertie(e.detail[0], e.detail[1]);
+    }
+    else{
+      alert('No puedes Deshipotecar propiedades fuera de tu turno');
+      return;
+    }
+  });
+
+  document.addEventListener('diceRolled', (e) => { //Cada vez que se lanza el dado corresponde a el turno de un jugador.
+
+    const numDice = e.detail;  //Almacenamos el numero que nos da los dados para asi poder trabajar con el.
+
     setTimeout(() => {
         if(popup) popup.style.display = "none";
       }, 1500);
-    if (infoPlayers[turn].active){
-      changePositionPlayer(numDice, infoPlayers[turn], tablero);
 
-      // Espera un pequeño instante antes de procesar la acción
+    if (infoPlayers[turn].active){ //Verificamos que le jugador en el turno correspondiente este activo.
+      changePositionPlayer(numDice, infoPlayers[turn], tablero);  //Modificamos el atributo de posicion del jugador y pintamos su n ueva posicion en el tablero.
+
+      // Espera un pequeño instante antes de procesar la acción. Asi damos tiempo a que se dibuje el usuario en la nueva posicion.
       setTimeout(() => {
-        const action = eventBox(infoPlayers[turn].position.toString(), infoPlayers[turn], infoPlayers);
-        processAction(action, infoPlayers, turn);
+
+        const action = eventBox(infoPlayers[turn].position.toString(), infoPlayers[turn], infoPlayers); // Verificamos que accion tiene el usuario al caer en dicha casilla.
+        processAction(action, infoPlayers, turn); //Procesamos dicha accion y modificamos a los elemento y/o atributos implicados.
 
         // Manejo de los turnos
         if (turn === maxTurn-1){
@@ -46,6 +62,7 @@ export function playGame(infoPlayers, tablero){
           turn++;
         }
       }, 100); 
+
       setTimeout(() => {
         if(popup) popup.style.display = "block";
       }, 3000);
@@ -390,7 +407,10 @@ export function loadPlayerInteface(objectPlayer) {
   const contentPlayerInterface = divInfoPlayer.querySelector('.player-content');
 
   const mortgageBtn = divInfoPlayer.querySelector(`#mortgage-${objectPlayer.color}`);
-  const propertiesSelect = mortgageBtn.previousElementSibling; // el select de propiedades.
+  const unMortgageBtn = divInfoPlayer.querySelector(`#unMortgage-${objectPlayer.color}`);
+
+  const propertiesSelect = mortgageBtn.previousElementSibling; // el Select de propiedades.
+  const mortgageSelect = unMortgageBtn.previousElementSibling; // el select hipotecas.
 
   // Eliminamos listeners anteriores para evitar duplicados
   header.onclick = null;
@@ -412,6 +432,18 @@ export function loadPlayerInteface(objectPlayer) {
     // Aquí ya puedes hacer tu acción específica
     document.dispatchEvent(new CustomEvent ('mortgagePropiertie', {detail : [selectedPropertyId, objectPlayer]}));
   
+  });
+  // 🔹 DESHIPOTECAR
+  unMortgageBtn.addEventListener('click', () => {
+    const selectedMortgageId = mortgageSelect.value;
+    if (!selectedMortgageId) {
+      alert('Selecciona una propiedad hipotecada antes de deshipotecar');
+      return;
+    }
+
+    document.dispatchEvent(
+      new CustomEvent('unMortgagePropiertie', { detail: [selectedMortgageId, objectPlayer] })
+    );
   });
 }
 
@@ -440,7 +472,6 @@ function getInfoElementHtml(idElement){
   const infoObject = JSON.parse(document.getElementById(`square-${idElement}`).getAttribute('data-tile-info')) || {};
   return infoObject;
 }
-
 
 function buildHouseOrHotel(propertyId, player) {
   const property = boardData.bottom.concat(boardData.left, boardData.top, boardData.right)
@@ -491,6 +522,20 @@ function mortgagePropiertie(idPropiertieMortgage, currentPlayer){
     currentPlayer.money += propInfo.mortgage;
   }
   loadPlayerInteface(currentPlayer);
+}
+
+function unMortgagePropiertie(idPropiertieUnMortgage, currentPlayer){
+  const deletedIndex = currentPlayer.mortgages.indexOf(`${idPropiertieUnMortgage}`);
+  
+  if (deletedIndex !== -1){
+    const mortgageInfo = getInfoElementHtml(idPropiertieUnMortgage);
+    currentPlayer.mortgages.splice(deletedIndex,1);
+    currentPlayer.money -= (mortgageInfo.mortgage) * 1.1
+    loadPlayerInteface(currentPlayer);
+  }
+  else{
+    console.log('No se logro encontrar el indice de la propiedad a deshipotecar')
+  }
 }
 /**
  * Procesa una acción generada por eventBox
@@ -594,4 +639,17 @@ function processAction(action, infoPlayers, turn) {
   
   // Actualizar interfaz después de la acción
   loadPlayerInteface(infoPlayers[turn]);
+}
+
+function turnValidation (turn, infoPlayers, colorPlayerTurn, maxTurn){
+  if (turn === maxTurn-1){
+    turn = 0;
+  } else {
+    turn++;
+  }
+  let validation = false;
+  if (infoPlayers[turn].color === colorPlayerTurn){
+    validation = true;
+  }
+  return validation;
 }
