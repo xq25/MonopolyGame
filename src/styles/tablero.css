@@ -23,6 +23,7 @@ body {
   box-sizing: border-box;
   padding: 5px;
   box-shadow: 0 0 5px rgba(0,0,0,0.5);   /* Corregido el box-shadow */
+  position: relative;          /* Añadido para el contexto de posicionamiento */
 }
 
 /* Cada casilla del tablero */
@@ -43,16 +44,15 @@ body {
   width: 100%;
 }
 
-/* Zona central del tablero */
+/* Zona central del tablero - SIMPLIFICADO SOLO PARA DADOS */
 #center {
   grid-row: 2 / 11;
   grid-column: 2 / 11;
-  display: grid;
-  grid-template-rows: 1fr 2fr 1fr;
-  grid-template-columns: 1fr 1fr 1fr;
-  background: #f5f5f5;
+  display: flex;
   align-items: center;
-  justify-items: center;
+  justify-content: center;
+  background: #f5f5f5;
+  position: relative;
 }
 
 /* Cartas de comunidad y suerte */

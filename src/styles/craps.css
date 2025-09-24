@@ -4,7 +4,14 @@ body {
 
 .card {
   width: 380px;
-}
+  background: rgba(255, 255, 255, 0.1);  /* Mucho más transparente */
+  backdrop-filter: blur(15px) brightness(1.1);  /* Más blur y brillo */
+  -webkit-backdrop-filter: blur(15px) brightness(1.1);  /* Para Safari */
+  border: 1px solid rgba(255, 255, 255, 0.5);  
+  border-radius: 15px;  
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+} 
 
 .result {
   font-size: 1.3rem;
@@ -16,7 +23,7 @@ body {
 .crap-section {
   position: absolute;
   top: 50%;
-  left: 50%;
+  left: 44%;  /* Ajustado ligeramente hacia la izquierda para pantallas grandes */
   transform: translate(-50%, -50%);
   z-index: 1000;
   width: 300px;
@@ -81,6 +88,7 @@ body {
 @media (max-width: 768px) {
   .crap-section {
     width: 280px;
+    left: 50%;  /* Centrado perfecto en pantallas pequeñas */
   }
   
   .crap {
