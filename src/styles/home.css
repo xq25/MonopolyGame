@@ -1,4 +1,4 @@
-/* Botón */
+/* Botón toggleSidebar */
 #toggleSidebar {
   position: fixed;
   top: 1px;
@@ -6,17 +6,38 @@
   z-index: 1000;
   width: 10%;
   height: 50px;
-  background-color: #024083f0;
-  color: white;
+
+  /* 🔹 Nuevo estilo */
+  background: linear-gradient(135deg, #064485f0, #012750f0); /* degrade en vez de un solo color */
+  color: #fff;
   border: none;
   padding: 10px 15px;
   cursor: pointer;
-  border-radius: 5px;
+  border-radius: 8px;
+
+  /* efectos */
+  font-weight: bold;
+  text-transform: uppercase;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease-in-out;
 }
+
+#toggleSidebar:hover {
+  background: linear-gradient(135deg, #012750f0, #064485f0);
+  transform: scale(1.05);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
+}
+
+#toggleSidebar:active {
+  transform: scale(0.97);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
 body {
   background: url('../assets/background.jpg') no-repeat center center fixed;
   margin: 0;
   height: 100vh;
+  font-family: 'Segoe UI', Arial, sans-serif;
 }
 
 /* Sidebar */
@@ -26,35 +47,128 @@ body {
   left: -100%; /* Oculto por defecto en móviles */
   width: 25%;
   height: 100%;
-  background-color: #064485f0;
-  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-  transition: left 0.3s ease;
+
+  /* 🔹 Nuevo estilo */
+  background: rgba(6, 68, 133, 0.9); /* tono más suave y translúcido */
+  backdrop-filter: blur(8px); /* efecto vidrio */
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
+  transition: left 0.3s ease, box-shadow 0.3s ease;
+
   z-index: 999;
   padding: 20px;
-  border: 2px solid #012750f0;
+  border-left: 2px solid #012750f0;
+  border-right: 2px solid #012750f0;
+  border-radius: 0 12px 12px 0; /* esquinas redondeadas lado visible */
 }
 
 /* Cuando está abierto */
 #SideBar.open {
   left: 0;
+  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.3);
 }
-/* Contenido */
+
+/* Contenido principal */
 #mainContent {
   transition: margin-left 0.3s ease;
   padding: 20px;
   margin-top: 1%;
   margin-left: 1%;
+
+  /* opcional darle un efecto suave */
+  background: rgba(255,255,255,0.02);
 }
+
+/* Botones dentro del sidebar */
 .buttons-sidebar {
   display: flex;
   flex-direction: column;
   align-items: center;
   margin-bottom: 10px;
-  
 }
+
+/* --- ESTADO NORMAL DE LOS BOTONES --- */
+.buttons-sidebar button {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+/* --- HOVER --- */
+.buttons-sidebar button:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.02);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+
+/* --- SELECCIÓN SIN JAVASCRIPT --- */
+/* Cuando se hace click y queda enfocado */
+.buttons-sidebar button:focus,
+.buttons-sidebar button:active {
+  outline: none;
+  background: linear-gradient(135deg, #00c6ff, #0072ff); /* gradiente azul */
+  color: #fff;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 114, 255, 0.4);
+  transform: scale(1.03);
+}
+
+/* --- BOTÓN PLAY FIJO ABAJO DEL SIDEBAR --- */
 #playButton {
-  position: absolute;
-  bottom: 40px;
+  position: absolute;           /* se fija respecto al SideBar */
+  bottom: 40px;                 /* pegado al fondo */
+  left: 0;
+  right: 0;                     /* ocupa todo el ancho */
+  transform: none;
+
+  /* Tamaño completo */
+  display: block;
+  width: 100%;                  /* ocupa todo el ancho del SideBar */
+  height: 55px;
+  margin: 0 auto;
+
+  /* Estilo llamativo */
+  border-radius: 12px;
+  background: linear-gradient(135deg, #ffdd00, #ffaa00);
+  color: #333;
+  font-size: 1.1rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+
+  /* Sombra y transición */
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+  transition: all 0.3s ease;
+  animation: pulse 2s infinite;
+}
+
+/* Hover */
+#playButton:hover {
+  background: linear-gradient(135deg, #ffaa00, #ffdd00);
+  transform: scale(1.03);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+/* Active */
+#playButton:active {
+  transform: scale(0.98);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+/* Pulso suave */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 rgba(255, 221, 0, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(255, 221, 0, 0.8);
+  }
+  100% {
+    box-shadow: 0 0 0 rgba(255, 221, 0, 0.4);
+  }
 }
 
 /* Pantallas grandes */
@@ -70,4 +184,3 @@ body {
     width: 75%;
   }
 }
-

@@ -47,10 +47,20 @@ export function playGame(infoPlayers, tablero){
     document.body.appendChild(endGameBtn);
 
     endGameBtn.addEventListener('click', () => {
+      // 🔹 Forzar actualización/validación de infoPlayers aquí para que no se carguen datos invalidos al score
+      const hasInvalid = infoPlayers.some(p => 
+        p.money == null || !Array.isArray(p.properties) || !Array.isArray(p.mortgages) 
+      );
+      if (hasInvalid) {
+        alert('Hay datos incompletos en infoPlayers');
+        return;
+      }
+
+      // 🔹 Ahora sí calcular score con datos frescos y validos.
       const scoreList = finalScores(infoPlayers);
-      // Acción al finalizar juego
-      document.dispatchEvent(new CustomEvent('endGame', {detail: n}));
-      // aquí podrías limpiar listeners, resetear variables, etc.
+
+      // 🔹 Disparar evento
+      document.dispatchEvent(new CustomEvent('endGame', { detail: scoreList }));
     });
   }
 
@@ -588,32 +598,29 @@ function turnValidation (turn, infoPlayers, colorPlayerTurn, maxTurn){
 function finalScores(playersList){
   let scoresList = [];
   playersList.forEach(player => {
-    let scorePlayer = 0;
-    scorePlayer += player.money;
-    let propertiesPlayer = player.properties;
-    let mortgagesPlayer = player.mortgages;
-    
+    // Asegura money como número
+    let scorePlayer = Number(player.money) || 0;
+
+    let propertiesPlayer = player.properties || [];
+    let mortgagesPlayer = player.mortgages || [];
+
     propertiesPlayer.forEach(prop => {
       if (!mortgagesPlayer.includes(prop)){
-        const infoProp = getInfoElementHtml(prop);
-        let propertieScore = 0;
-        propertieScore += infoProp.price;
-        propertieScore += (infoProp.amountHouses * 100);
-        propertieScore += (infoProp.amountHouses * 200);
+        const infoProp = getInfoElementHtml(prop) || {};
+        let price = Number(infoProp.price) || 0;
+        let houses = Number(infoProp.amountHouses) || 0;
+
+        let propertieScore = price + (houses * 100) + (houses * 200);
         scorePlayer += propertieScore;
       }
     });
-    scoresList.push({'nick_name': player.nick_name, 'score' : scorePlayer, 'country_code' : player.country })
+
+    scoresList.push({
+      'nick_name': player.nick_name,
+      'score': isNaN(scorePlayer) ? 0 : scorePlayer, // fallback
+      'country_code': player.country
+    });
   });
-  return scoresList
+  return scoresList;
 }
 
-function endGame(scoreList){
-  scoreList.forEach(scorePlayer => {
-    fetch('http://127.0.0.1/score-recorder',{
-      method : 'POST',
-      body : JSON.stringify(scorePlayer)
-    })
-  });
-    
-}

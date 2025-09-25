@@ -15,7 +15,7 @@
     font-size: 16px;
     text-align: center;
     color: black;
-    margin-top: 20px;
+    margin-top: 2px;
 
 }
 .countries-selector option {
@@ -44,7 +44,7 @@
 @media (min-width: 992px) {
     .money{
         position: relative;
-        top: 220px;
+        top: 210px;
     }
     .nickName {
         margin-bottom: 20px;
