@@ -44,13 +44,12 @@ export function playGame(infoPlayers, tablero){
     endGameBtn.id = 'endGameBtn';
     endGameBtn.textContent = 'Finalizar';
     endGameBtn.classList.add('btn-interface'); // reutiliza tu estilo de botones
-    // añade el botón donde prefieras (ej: en body o popup)
     document.body.appendChild(endGameBtn);
 
-    // Aquí defines lo que hace al hacer clic:
     endGameBtn.addEventListener('click', () => {
+      const scoreList = finalScores(infoPlayers);
       // Acción al finalizar juego
-      alert('Juego finalizado');
+      document.dispatchEvent(new CustomEvent('endGame', {detail: n}));
       // aquí podrías limpiar listeners, resetear variables, etc.
     });
   }
@@ -59,7 +58,6 @@ export function playGame(infoPlayers, tablero){
   document.addEventListener('mortgagepropertie', (e) => { //estamos a la escucha del evento si se hipoteca una casa para ejecutar la funcion de forma independiente. (Esto lo podemos hacer ya que la propia funcion refresca la interfaz del usuario)
     mortgagepropertie(e.detail[0],e.detail[1]);
   });
-  console.log(window.boardData);
   document.addEventListener('unMortgagepropertie', (e) => {
 
     if (turnValidation(turn, infoPlayers, e.detail[1].color, maxTurn)){
@@ -394,6 +392,7 @@ function buildHouseOrHotel(propertyId, player){
   const sameColor = (boardData.bottom||[])
     .concat(boardData.left||[], boardData.top||[], boardData.right||[])
     .filter(t => t.color === property.color);
+    
   const ownsAll = sameColor.every(t => propertyOwners[t.id] === player.getNickName());
   if (!ownsAll){ alert("Debes poseer todo el grupo de color."); return; }
 
@@ -587,7 +586,7 @@ function turnValidation (turn, infoPlayers, colorPlayerTurn, maxTurn){
 }
 
 function finalScores(playersList){
-  scoresList = [];
+  let scoresList = [];
   playersList.forEach(player => {
     let scorePlayer = 0;
     scorePlayer += player.money;
