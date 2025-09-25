@@ -19,10 +19,11 @@ body {
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
     overflow: hidden;
     backdrop-filter: blur(10px);
+    border: 2px solid #012750f0;
 }
 
 h2 {
-    background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+    background: linear-gradient(45deg, #024083f0, #064485f0);
     color: white;
     text-align: center;
     padding: 30px;
@@ -40,7 +41,7 @@ h2 {
 }
 
 .table thead {
-    background: linear-gradient(45deg, #2C3E50, #34495E);
+    background: linear-gradient(45deg, #012750f0, #024083f0);
 }
 
 .table th {
@@ -51,6 +52,7 @@ h2 {
     letter-spacing: 1px;
     font-size: 0.9rem;
     position: relative;
+    text-align: center;
 }
 
 .table th:first-child {
@@ -73,37 +75,40 @@ h2 {
 .table tbody tr:hover {
     background: linear-gradient(45deg, #f8f9fa, #e9ecef);
     transform: translateX(5px);
-    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 5px 0 15px rgba(2, 64, 131, 0.1);
 }
 
+/* Primer lugar - Oro con toque azul */
 .table tbody tr:nth-child(1) {
-    background: linear-gradient(45deg, #FFD700, #FFA500);
+    background: linear-gradient(45deg, #FFD700, #024083f0);
     color: white;
     font-weight: bold;
 }
 
 .table tbody tr:nth-child(1):hover {
-    background: linear-gradient(45deg, #FFD700, #FF8C00);
+    background: linear-gradient(45deg, #FFD700, #012750f0);
 }
 
+/* Segundo lugar - Plata con toque azul */
 .table tbody tr:nth-child(2) {
-    background: linear-gradient(45deg, #C0C0C0, #A0A0A0);
+    background: linear-gradient(45deg, #C0C0C0, #064485f0);
     color: white;
     font-weight: bold;
 }
 
 .table tbody tr:nth-child(2):hover {
-    background: linear-gradient(45deg, #C0C0C0, #909090);
+    background: linear-gradient(45deg, #C0C0C0, #024083f0);
 }
 
+/* Tercer lugar - Bronce con toque azul */
 .table tbody tr:nth-child(3) {
-    background: linear-gradient(45deg, #CD7F32, #B8860B);
+    background: linear-gradient(45deg, #CD7F32, #064485f0);
     color: white;
     font-weight: bold;
 }
 
 .table tbody tr:nth-child(3):hover {
-    background: linear-gradient(45deg, #CD7F32, #A0791A);
+    background: linear-gradient(45deg, #CD7F32, #024083f0);
 }
 
 .table td {
@@ -136,7 +141,7 @@ h2 {
     width: 35px;
     height: 35px;
     border-radius: 50%;
-    background: linear-gradient(45deg, #667eea, #764ba2);
+    background: linear-gradient(45deg, #024083f0, #064485f0);
     color: white;
     font-weight: bold;
     font-size: 1.1rem;
@@ -144,16 +149,16 @@ h2 {
 }
 
 .table tbody tr:nth-child(1) .position-badge {
-    background: linear-gradient(45deg, #FFD700, #FFA500);
+    background: linear-gradient(45deg, #FFD700, #024083f0);
     animation: pulse 2s infinite;
 }
 
 .table tbody tr:nth-child(2) .position-badge {
-    background: linear-gradient(45deg, #C0C0C0, #A0A0A0);
+    background: linear-gradient(45deg, #C0C0C0, #064485f0);
 }
 
 .table tbody tr:nth-child(3) .position-badge {
-    background: linear-gradient(45deg, #CD7F32, #B8860B);
+    background: linear-gradient(45deg, #CD7F32, #064485f0);
 }
 
 @keyframes pulse {
@@ -163,7 +168,7 @@ h2 {
     }
     50% {
         transform: scale(1.05);
-        box-shadow: 0 8px 16px rgba(255, 215, 0, 0.4);
+        box-shadow: 0 8px 16px rgba(2, 64, 131, 0.4);
     }
     100% {
         transform: scale(1);
@@ -174,7 +179,7 @@ h2 {
 .score {
     font-weight: bold;
     font-size: 1.3rem;
-    color: #2C3E50;
+    color: #024083f0;
 }
 
 .table tbody tr:nth-child(1) .score,
@@ -196,7 +201,7 @@ h2 {
 
 .error-message {
     text-align: center;
-    color: #e74c3c;
+    color: #024083f0;
     font-weight: bold;
     font-size: 1.1rem;
     padding: 30px;
@@ -214,13 +219,14 @@ h2 {
         border-radius: 12px;
         max-width: calc(100vw - 10px);
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        border: 2px solid #012750f0;
     }
 
     h2 {
         font-size: 1.5rem;
         padding: 15px 10px;
         letter-spacing: 0.5px;
-        background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+        background: linear-gradient(45deg, #024083f0, #064485f0);
     }
 
     /* Hacer la tabla más compacta */
@@ -233,6 +239,7 @@ h2 {
         padding: 10px 5px;
         font-size: 0.7rem;
         white-space: nowrap;
+        text-align: center;
     }
 
     .table td {
@@ -301,7 +308,7 @@ h2 {
     /* Reducir efectos hover en móvil */
     .table tbody tr:hover {
         transform: translateX(2px);
-        box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1);
+        box-shadow: 3px 0 10px rgba(2, 64, 131, 0.1);
     }
 }
 
@@ -330,6 +337,7 @@ h2 {
     .table th {
         padding: 8px 3px;
         font-size: 0.65rem;
+        text-align: center;
     }
 
     .table td {
@@ -368,6 +376,7 @@ h2 {
 
     .table th {
         padding: 8px 6px;
+        text-align: center;
     }
 
     .table td {
