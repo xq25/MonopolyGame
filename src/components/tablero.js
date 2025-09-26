@@ -5,18 +5,40 @@ window.updatePropertyState = function(propertyId, ownerColor) {
   const square = document.getElementById(`square-${propertyId}`);
   if (!square) return;
   
-  const stateDiv = square.querySelector('.property-state');
-  if (!stateDiv) return;
+  // Busca el NUEVO div para el propietario (no el color-bar original)
+  const ownerBar = square.querySelector('.owner-bar');
+  if (!ownerBar) return;
   
-  // Cambiar el color según el dueño (sin mostrar texto)
+  // Cambia el color del div del propietario (NO el color-bar original)
   if (ownerColor) {
-    stateDiv.style.backgroundColor = ownerColor;
-    stateDiv.textContent = "";  // Sin texto, solo el color
-    stateDiv.style.height = "8px";  // Hacerlo más pequeño como un indicador de color
+    ownerBar.style.backgroundColor = ownerColor;
   } else {
-    stateDiv.style.backgroundColor = "transparent";
-    stateDiv.style.color = "black";
-    stateDiv.style.height = "15px";  // Tamaño normal para cuando está disponible
+    ownerBar.style.backgroundColor = "transparent";
+  }
+
+  // Obtiene el tipo de casilla
+  const tileType = square.getAttribute('data-type');
+  
+  // Si es ferrocarril, solo mostrar el color del propietario (sin casas/hoteles)
+  if (tileType === 'railroad') {
+    ownerBar.textContent = ""; // No mostrar texto en ferrocarriles
+    return;
+  }
+
+  // Si es propiedad normal, mostrar casas y hoteles
+  if (tileType === 'property') {
+    const tileInfo = square.getAttribute('data-tile-info');
+    let casas = 0, hoteles = 0;
+    if (tileInfo) {
+      try {
+        const info = JSON.parse(tileInfo);
+        casas = info.amountHouses ?? 0;
+        hoteles = info.amountHotels ?? 0;
+      } catch {}
+    }
+
+    // Muestra el texto SIEMPRE (aunque sean 0) solo para propiedades
+    ownerBar.textContent = `🏠${casas} 🏨${hoteles}`;
   }
 }
 function makeSquare(tile) { //creamos las casillas
@@ -46,6 +68,20 @@ function makeSquare(tile) { //creamos las casillas
     color.className = "color-bar";// le asignamos la clase
     color.style.background = tile.color;// le asignamos a la casilla el color que le corresponde(si tiene)
     div.appendChild(color);
+  }
+
+  // NUEVO: div para el estado del propietario (para propiedades Y ferrocarriles)
+  if (tile.type === "property" || tile.type === "railroad") {
+    const ownerBar = document.createElement("div");
+    ownerBar.className = "owner-bar";
+    ownerBar.style.height = "18px";
+    ownerBar.style.backgroundColor = "transparent";
+    ownerBar.style.textAlign = "center";
+    ownerBar.style.fontSize = "13px";
+    ownerBar.style.fontWeight = "bold";
+    ownerBar.style.lineHeight = "18px";
+    ownerBar.style.color = "#fff";
+    div.appendChild(ownerBar);
   }
 
   // Estado de la propiedad (nuevo)
