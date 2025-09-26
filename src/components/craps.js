@@ -40,19 +40,20 @@ function initCraps(
   }
 
   rollButton.addEventListener("click", () => {
-    let test = false;
     
     let roll1 = parseInt(manualCrap1.value, 10);
     let roll2 = parseInt(manualCrap2.value, 10);
 
-    const isManual1 = manualCrap1.value.trim() !== "" && !isNaN(roll1);
-    const isManual2 = manualCrap2.value.trim() !== "" && !isNaN(roll2);
+    const isManual1 = !isNaN(roll1);
+    const isManual2 = !isNaN(roll2);
 
     if (!isManual1) roll1 = Math.floor(Math.random() * 6) + 1;
     if (!isManual2) roll2 = Math.floor(Math.random() * 6) + 1;
 
     const total = roll1 + roll2;
-    if (isManual1 === null) {
+    if (manualCrap1.value.trim() === "" && manualCrap2.value.trim() === "") {
+      console.log(isManual1);
+      console.log(isManual2); 
       drawcrap(crap1, roll1);
       drawcrap(crap2, roll2);
     }
