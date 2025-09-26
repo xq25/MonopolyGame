@@ -39,7 +39,7 @@ export function playGame(infoPlayers, tablero){
 
   let turn = 0; // Manejamos una variable en la cual vamos a ir almacenando la logica de los turnos que corresponde al mismo tiempo a un  indice de infoPlayers.
   const maxTurn = infoPlayers.length; // maxTurn permite saber la cantidad de usuarios para asi manejar el limite superior de nuestra logica de turnos.
-  
+  initializePositionPlayers(infoPlayers, tablero);
   initCraps(); // Inicializamos los dados para realizar el primer turno
   if (popup) popup.style.display = "block";
 
@@ -143,13 +143,23 @@ export function playGame(infoPlayers, tablero){
  */
 function changePositionPlayer(numDados, infoPlayer, tablero){
   let posPlayer = infoPlayer.position + numDados;
+
   if (posPlayer >= 40){
-    posPlayer -= 40;
+
+    let turnsOnBoard = Math.trunc(posPlayer / 40);
+    posPlayer -= (40 * turnsOnBoard);
+
     const goBonus = (boardData.bottom.concat(boardData.left, boardData.top, boardData.right)
       .find(tile => tile.id == 0)?.action?.money) || 200;
-    infoPlayer.setMoney(infoPlayer.getMoney() + goBonus);
+
+    infoPlayer.setMoney(infoPlayer.getMoney() + goBonus*turnsOnBoard);
     alert(`¡${infoPlayer.getNickName()} pasa por la salida y recibe $${goBonus}!`);
   }
+  else if (posPlayer < 0){
+    let turnsOnBoard = Math.floor(Math.abs(posPlayer) / 40) + 1; // +1 para cubrir negativos exactos
+    posPlayer += turnsOnBoard * 40;
+  }
+
   infoPlayer.position = posPlayer;
 
   const targetSquare = document.getElementById(`square-${posPlayer}`);
@@ -165,6 +175,12 @@ function changePositionPlayer(numDados, infoPlayer, tablero){
   tokenPlayer.classList.add('token');
   tokenPlayer.id = `token-${infoPlayer.color}`;
   targetSquare.appendChild(tokenPlayer);
+}
+
+function initializePositionPlayers(playersList, tablero){
+  playersList.forEach(player => {
+    changePositionPlayer(0, player, tablero)
+  });
 }
 
 function eventBox(numDice, currentPlayer, allPlayers) {
