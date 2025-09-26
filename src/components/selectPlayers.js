@@ -142,6 +142,18 @@ Sin el IIFE, podrías tener problemas si el script se carga antes de que el HTML
                 }
                 countryValidation = false;
             }
+             // 🔹 Validar nickname duplicado entre formularios activos
+            // Recolectar todos los inputs de nickName visibles
+            const allNicknames = Array.from(document.querySelectorAll('.formPlayers input'))
+                .map(input => input.value.trim())
+                .filter(n => n !== ''); // quitamos vacíos
+
+            // Si el nickname actual aparece más de una vez
+            const duplicates = allNicknames.filter(nick => nick === data.nickName);
+            if (duplicates.length > 1) {
+                errorDivInput.textContent = 'Este nickname ya está en uso!!';
+                nameValidation = false;
+            }
             
 
         }

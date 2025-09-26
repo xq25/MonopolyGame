@@ -23,6 +23,7 @@ function initializeHomePage() {
     }));
     changeSidebar(); //Metemos toda la logica de manejo del sideBar
 }
+
 function initializeSelectPlayers(){
     loadContent(mainContainer, "/src/pages/selectPlayers.html").then(() => {
             // Carga manual del script después de que el contenido se haya cargado, Para asi poder encontrar los elementos que se ejecutan en el script
@@ -33,6 +34,29 @@ function initializeSelectPlayers(){
             document.body.appendChild(script);
             // Escuchar el evento personalizado  
         });
+}
+
+async function saveScores(scoreList){
+    console.log(scoreList);
+
+    // recorre cada jugador de forma secuencial
+    for (const scorePlayer of scoreList) {
+        console.log(scorePlayer);
+        try {
+            const res = await fetch('http://127.0.0.1:5000/score-recorder', {
+                method : 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body : JSON.stringify(scorePlayer)
+            });
+            if(!res.ok) throw new Error('Error en la respuesta');
+            const json = await res.json();
+            console.log(json);
+        } catch (err) {
+            console.error('Error enviando datos', err);
+        }
+    }
 }
 document.addEventListener("DOMContentLoaded", () => {
     initializeHomePage();
@@ -58,13 +82,23 @@ document.addEventListener("DOMContentLoaded", () => {
         document.addEventListener('boardReady', () => {
             const tablero = document.getElementById('board');
             const objectList = initializePlayersClass(infoPlayers);
+            
             objectList.forEach(player => {
                 loadPlayerInterface(player);
             });
-            playGame(objectList, tablero)
+            playGame(objectList, tablero);
         });
         //Aqui hay que hacer otra funcion en la cual despues de cargar el tablero se carguen el resto de los elementos e inicie el juego
     }, { once: true }); //Esto nos indica que solo va a escuchar este evento una unica vez. Ya que solo despues de que la info en los formularios este bien, se iniciara el juego.
-    
+    document.addEventListener('endGame', async (e) =>{
+        const scores = e.detail;
+        if (scores){
+            await saveScores(scores)
+        }
+        alert('Partida Finalizada. Visita el ranking para ver los resultados!');
+        location.reload();
+        
+    })
+
 });  
 

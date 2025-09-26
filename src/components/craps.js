@@ -40,22 +40,23 @@ function initCraps(
   }
 
   rollButton.addEventListener("click", () => {
-    // rollButton.disabled = true;
+    let test = false;
     
     let roll1 = parseInt(manualCrap1.value, 10);
     let roll2 = parseInt(manualCrap2.value, 10);
 
-    const isManual1 = manualCrap1.value.trim() !== "" && !isNaN(roll1) && roll1 >= 1 && roll1 <= 6;
-    const isManual2 = manualCrap2.value.trim() !== "" && !isNaN(roll2) && roll2 >= 1 && roll2 <= 6;
+    const isManual1 = manualCrap1.value.trim() !== "" && !isNaN(roll1);
+    const isManual2 = manualCrap2.value.trim() !== "" && !isNaN(roll2);
 
     if (!isManual1) roll1 = Math.floor(Math.random() * 6) + 1;
     if (!isManual2) roll2 = Math.floor(Math.random() * 6) + 1;
 
     const total = roll1 + roll2;
-
-    drawcrap(crap1, roll1);
-    drawcrap(crap2, roll2);
-
+    if (isManual1 === null) {
+      drawcrap(crap1, roll1);
+      drawcrap(crap2, roll2);
+    }
+    
     if (isManual1 || isManual2) {
       result.textContent = `Movimiento manual: ${roll1} + ${roll2} = ${total}`;
     } else {

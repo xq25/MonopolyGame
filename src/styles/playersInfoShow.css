@@ -215,6 +215,42 @@
   transform: scale(0.98);
   background: rgba(255, 255, 255, 0.4);
 }
+/* Botón flotante encima del tablero */
+#endGameBtn {
+  position: fixed;            /* lo saca del flujo normal */
+  bottom: 5px;               /* distancia desde el fondo */
+  right: 47%; 
+  left: 47%;               /* distancia desde la derecha */
+  z-index: 9999;              /* asegura que esté por encima de otros elementos */
+  height: 20px;
+  width: 7%;
+  
+  background: linear-gradient(135deg, #ff4b2b, #ff416c);
+  color: #fff;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: bold;
+  padding: 1px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease-in-out;
+  animation: fadeIn 0.4s ease-out;
+}
+
+/* Hover */
+#endGameBtn:hover {
+  background: linear-gradient(135deg, #ff416c, #ff4b2b);
+  transform: scale(1.05);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Active */
+#endGameBtn:active {
+  transform: scale(0.98);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
 
 @media(min-width: 992px){
   .playerInterface{

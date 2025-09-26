@@ -28,19 +28,60 @@ function getTileById(id){
     .concat(boardData.left||[], boardData.top||[], boardData.right||[])
     .find(t => t.id === id);
 }
-
+/**
+ * Esta funcion es la que maneja toda la logica dentro de la partida. Cada uno de los eventos y sus respuestas dentro del tablero.
+ * 
+ * @param {Player[]} infoPlayers - Este parametro es el que almacena todos nuestros players y se actualiza a medida que pasa el juego.
+ * @param {HTMLElement} tablero - Este es el elemento HTML del tablero. Lo usamos para hacer actualizaciones sobre el y acceder a las casillas.
+ */
 export function playGame(infoPlayers, tablero){
   const popup = result?.closest('.crap-section') || result?.parentElement;
-  let turn = 0;
-  const maxTurn = infoPlayers.length;
-  
-  initCraps();
+
+  let turn = 0; // Manejamos una variable en la cual vamos a ir almacenando la logica de los turnos que corresponde al mismo tiempo a un  indice de infoPlayers.
+  const maxTurn = infoPlayers.length; // maxTurn permite saber la cantidad de usuarios para asi manejar el limite superior de nuestra logica de turnos.
+  initializePositionPlayers(infoPlayers, tablero);
+  initCraps(); // Inicializamos los dados para realizar el primer turno
   if (popup) popup.style.display = "block";
 
+  // 🔹 Crear botón Finalizar juego si no existe aún (Depuracion)
+  let endGameBtn = document.getElementById('endGameBtn');
+
+  if (!endGameBtn) {
+
+    endGameBtn = document.createElement('button');
+    endGameBtn.id = 'endGameBtn';
+    endGameBtn.textContent = 'Finalizar';
+    endGameBtn.classList.add('btn-interface'); 
+
+    document.body.appendChild(endGameBtn);
+
+    endGameBtn.addEventListener('click', () => { //Evento de finalizacion del juego.
+
+      // 🔹 Forzar actualización/validación de infoPlayers aquí para que no se carguen datos invalidos al score
+      const hasInvalid = infoPlayers.some(p => 
+        p.money == null || !Array.isArray(p.properties) || !Array.isArray(p.mortgages)  //Validamos que todos los datos del score correspondan a la naturalidad necesaria para poder trabajar con ellos y sacar el score de cada jugador
+      );
+      if (hasInvalid) {
+        alert('Hay datos incompletos en infoPlayers');
+        return;
+      }
+
+      // 🔹 calculamos score con datos frescos y validos.
+      const scoreList = finalScores(infoPlayers);
+
+      // 🔹 Disparar evento
+      document.dispatchEvent(new CustomEvent('endGame', { detail: scoreList })); // Disparamos un evento personalizado para manejarlo todo desde el index.js
+    });
+  }
+
+// Listener de eventos individuales de cada proceso de la interfaz del usuario. 
+
+  //Esto no depende directamente del turno del usuario. (Se puede hipotecar una propiedad siempre que el usuario necesite liquidez).
   document.addEventListener('mortgagepropertie', (e) => { //estamos a la escucha del evento si se hipoteca una casa para ejecutar la funcion de forma independiente. (Esto lo podemos hacer ya que la propia funcion refresca la interfaz del usuario)
     mortgagepropertie(e.detail[0],e.detail[1]);
   });
-  console.log(window.boardData);
+
+  //Esto depende directamente del turno del usuario. (No se puede hipotecar una propiedad fuera del turno del usuario).
   document.addEventListener('unMortgagepropertie', (e) => {
 
     if (turnValidation(turn, infoPlayers, e.detail[1].color, maxTurn)){
@@ -93,15 +134,32 @@ export function playGame(infoPlayers, tablero){
   });
 }
 
+/**
+ * 
+ * @param {number} numDados - Este parametro almacena el numero sacado en el turno del jugador por los dados. 
+ * @param {object} infoPlayer - Este parametro almacena todo el objeto del player que esta realizando la funcion de moverse.
+ * @param {HTMLElement} tablero - Este parametro almacena el elemento HTML del tablero el cual va a ser modificado.
+ * @returns - No retornamos nada, se hacen las modificaciones en los atributos del player correspondiente y se pinta su posicion en el tablero.
+ */
 function changePositionPlayer(numDados, infoPlayer, tablero){
   let posPlayer = infoPlayer.position + numDados;
+
   if (posPlayer >= 40){
-    posPlayer -= 40;
+
+    let turnsOnBoard = Math.trunc(posPlayer / 40);
+    posPlayer -= (40 * turnsOnBoard);
+
     const goBonus = (boardData.bottom.concat(boardData.left, boardData.top, boardData.right)
       .find(tile => tile.id == 0)?.action?.money) || 200;
-    infoPlayer.setMoney(infoPlayer.getMoney() + goBonus);
+
+    infoPlayer.setMoney(infoPlayer.getMoney() + goBonus*turnsOnBoard);
     alert(`¡${infoPlayer.getNickName()} pasa por la salida y recibe $${goBonus}!`);
   }
+  else if (posPlayer < 0){
+    let turnsOnBoard = Math.floor(Math.abs(posPlayer) / 40) + 1; // +1 para cubrir negativos exactos
+    posPlayer += turnsOnBoard * 40;
+  }
+
   infoPlayer.position = posPlayer;
 
   const targetSquare = document.getElementById(`square-${posPlayer}`);
@@ -117,6 +175,12 @@ function changePositionPlayer(numDados, infoPlayer, tablero){
   tokenPlayer.classList.add('token');
   tokenPlayer.id = `token-${infoPlayer.color}`;
   targetSquare.appendChild(tokenPlayer);
+}
+
+function initializePositionPlayers(playersList, tablero){
+  playersList.forEach(player => {
+    changePositionPlayer(0, player, tablero)
+  });
 }
 
 function eventBox(numDice, currentPlayer, allPlayers) {
@@ -262,7 +326,11 @@ function eventBox(numDice, currentPlayer, allPlayers) {
 
   return {};
 }
-
+/**
+ * 
+ * @param {Object[]} playersList - Este parametro almacena la informacion de los formularios iniciales.
+ * @returns - Nos retorna una lista de Objetos de la clase player con todos los atributos referenciados en el enunciado del proyecto (por defecto).
+ */
 export function initializePlayersClass(playersList){
   return playersList.map(item => {
     const p = new Player(item.nickName, item.country, item.color);
@@ -272,6 +340,11 @@ export function initializePlayersClass(playersList){
   });
 }
 
+/**
+ * 
+ * @param {Player} objectPlayer - Este parametro almacena una instancia player con todos sus atributos para ser cargados (visualmente)
+ * @returns 
+ */
 export function loadPlayerInterface(objectPlayer){
   if (!objectPlayer) return;
   const gameDiv = document.getElementById('gameDiv');
@@ -362,6 +435,11 @@ function endGameBrokeCondition(infoPlayers){
   return playersBroke.length === infoPlayers.length - 1;
 }
 
+/**
+ * Esta funcion noss permite acceder a la informacion principal de una casilla para asi trabajar con todos sus datos.
+ * @param {number} idElement - Este parametro almacena el id de la casilla sobre la cual deseamos acceder a su variable (data-tile-info)
+ * @returns - Nos devuelve la informacion de la casilla en forma de objeto.
+ */
 function getInfoElementHtml(idElement){
   const el = document.getElementById(`square-${idElement}`);
   if (!el) return {};
@@ -375,6 +453,7 @@ function buildHouseOrHotel(propertyId, player){
   const sameColor = (boardData.bottom||[])
     .concat(boardData.left||[], boardData.top||[], boardData.right||[])
     .filter(t => t.color === property.color);
+    
   const ownsAll = sameColor.every(t => propertyOwners[t.id] === player.getNickName());
   if (!ownsAll){ alert("Debes poseer todo el grupo de color."); return; }
 
@@ -419,6 +498,11 @@ function buildHouseOrHotel(propertyId, player){
   loadPlayerInterface(player);
 }
 
+/**
+ * 
+ * @param {number} idpropertieMortgage - Este parametro almecena la el id de la propiedad que deseamos hipotecar.
+ * @param {Player} currentPlayer - Este parametro contiene todo el objeto del player que desea hipotecar una propiedad.
+ */
 function mortgagepropertie(idpropertieMortgage, currentPlayer){
   if (!currentPlayer.mortgages) currentPlayer.mortgages = [];
   
@@ -430,6 +514,11 @@ function mortgagepropertie(idpropertieMortgage, currentPlayer){
   loadPlayerInterface(currentPlayer);
 }
 
+/**
+ * 
+ * @param {number} idpropertieUnMortgage - Este parametro almecena la el id de la propiedad que deseamos des-hipotecar.
+ * @param {Player} currentPlayer - Este parametro contiene todo el objeto del player que desea des-hipotecar una propiedad.
+ */
 function unMortgagepropertie(idpropertieUnMortgage, currentPlayer){
   const deletedIndex = currentPlayer.mortgages.indexOf(`${idpropertieUnMortgage}`);
   
@@ -567,35 +656,37 @@ function turnValidation (turn, infoPlayers, colorPlayerTurn, maxTurn){
   return validation;
 }
 
+/**
+ * 
+ * @param {Player[]} playersList - Este parametro almacena la lista de instancias player para poder sacar sus atributos y asi utilizarlos en el calculo del score.
+ * @returns {object[]}
+ */
 function finalScores(playersList){
-  scoresList = [];
+  let scoresList = [];
   playersList.forEach(player => {
-    let scorePlayer = 0;
-    scorePlayer += player.money;
-    let propertiesPlayer = player.properties;
-    let mortgagesPlayer = player.mortgages;
-    
+    // Asegura money como número
+    let scorePlayer = Number(player.money) || 0;
+
+    let propertiesPlayer = player.properties || [];
+    let mortgagesPlayer = player.mortgages || [];
+
     propertiesPlayer.forEach(prop => {
       if (!mortgagesPlayer.includes(prop)){
-        const infoProp = getInfoElementHtml(prop);
-        let propertieScore = 0;
-        propertieScore += infoProp.price;
-        propertieScore += (infoProp.amountHouses * 100);
-        propertieScore += (infoProp.amountHouses * 200);
+        const infoProp = getInfoElementHtml(prop) || {};
+        let price = Number(infoProp.price) || 0;
+        let houses = Number(infoProp.amountHouses) || 0;
+
+        let propertieScore = price + (houses * 100) + (houses * 200);
         scorePlayer += propertieScore;
       }
     });
-    scoresList.push({'nick_name': player.nick_name, 'score' : scorePlayer, 'country_code' : player.country })
+
+    scoresList.push({
+      'nick_name': player.nick_name,
+      'score': isNaN(scorePlayer) ? 0 : scorePlayer, // fallback
+      'country_code': player.country
+    });
   });
-  return scoresList
+  return scoresList;
 }
 
-function endGame(scoreList){
-  scoreList.forEach(scorePlayer => {
-    fetch('http://127.0.0.1/score-recorder',{
-      method : 'POST',
-      body : JSON.stringify(scorePlayer)
-    })
-  });
-    
-}

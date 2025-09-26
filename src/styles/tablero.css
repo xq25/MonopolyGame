@@ -1,36 +1,38 @@
-/* Estilos principales para el fondo y la organización general de la página */
+/* =============================
+   ESTILOS GENERALES
+============================= */
 body {
   font-family: Arial, sans-serif;
-  background: #f5f5f5;
+  background: url('../assets/background.jpg') no-repeat center center fixed;
   display: flex;
   justify-content: center;
   align-items: center;
   margin: 0;
-  min-height: 100vh;           /* Cambiado de height a min-height para mejor responsive */
-  padding: 5px;                /* Añadido padding para evitar que toque los bordes */
-  box-sizing: border-box;      /* Añadido para que el padding no afecte el tamaño */
-}
-body {
-  background: url('../assets/background.jpg') no-repeat center center fixed;
-  margin: 0;
-  height: 100vh;
+  min-height: 100vh;  /* Responsive */
+  padding: 5px;       /* Evita pegarse a bordes */
+  box-sizing: border-box;
 }
 
-/* El tablero principal del juego, cuadrado y centrado */
+/* =============================
+   TABLERO PRINCIPAL
+============================= */
 .board {
-  height: 90vmin;              /* Reducido ligeramente para mejor visualización */
   width: 90vmin;
+  height: 90vmin;
   display: grid;
   grid-template-rows: repeat(11, 1fr);
   grid-template-columns: repeat(11, 1fr);
   gap: 2px;
+  padding: 5px;
   background: #333;
   box-sizing: border-box;
-  padding: 5px;
-  box-shadow: 0 0 5px rgba(0,0,0,0.5);   /* Corregido el box-shadow */
-  position: relative;          /* Añadido para el contexto de posicionamiento */
+  box-shadow: 0 0 5px rgba(0,0,0,0.5);
+  position: relative;
 }
-/* Cada casilla del tablero */
+
+/* =============================
+   CASILLAS DEL TABLERO
+============================= */
 .square {
   background: white;
   border: 1px solid #999;
@@ -39,30 +41,39 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  overflow: hidden;            /* Evitar desbordamiento de texto */
+  overflow: hidden;
+  position: relative; /* Necesario para centrar tokens */
 }
 
-/* Barra de color en algunas casillas */
 .color-bar {
   height: 10px;
   width: 100%;
 }
 
-/* Zona central del tablero */
-/* Modificar los estilos de #center */
+/* =============================
+   ZONA CENTRAL
+============================= */
 #center {
   grid-row: 2 / 11;
   grid-column: 2 / 11;
-  /* Eliminar el display grid ya que no tendremos elementos internos */
   display: flex;
   justify-content: center;
   align-items: center;
-  /* Agregar la imagen como fondo */
   background: url("/src/assets/monopoly-center.png") no-repeat center center;
-  background-size: cover; /* Esto hace que la imagen cubra todo el espacio */
+  background-size: cover;
 }
 
-/* Cartas de comunidad y suerte */
+#logo {
+  grid-row: 2;
+  grid-column: 2;
+  width: 250px;
+  height: 150px;
+  background: url("/src/assets/logo.png") no-repeat center/contain;
+}
+
+/* =============================
+   CARTAS
+============================= */
 .carta {
   width: 100px;
   height: 150px;
@@ -76,108 +87,87 @@ body {
   margin: 10px;
 }
 
-/* Posición de la carta de comunidad */
 #cajaComunidad {
   grid-row: 1;
   grid-column: 2;
   background-color: lightblue;
 }
 
-/* Posición de la carta de suerte */
 #cajaSuerte {
   grid-row: 3;
   grid-column: 2;
   background-color: lightgreen;
 }
 
-/* Logo en el centro del tablero */
-#logo {
-  grid-row: 2;
-  grid-column: 2;
-  width: 250px;
-  height: 150px;
-  background: url("/src/assets/logo.png") no-repeat center/contain;
+/* =============================
+   TOKENS (FICHAS DE JUGADOR)
+============================= */
+.token {
+  position: absolute;             /* relativo a .square */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Centrado */
+  width: 50%;                     
+  height: 50%;
+  border-radius: 50%;
+  border: 2px solid #333;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  pointer-events: none;           /* No bloquea clics */
+  opacity: 0.8; /* 🔹 Un poquito transparente */
+  z-index: 90000;                 /* Por encima de todo */
 }
 
-/* Cambios para cuando se ve en celulares o pantallas pequeñas */
+/* Colores de cada jugador */
+#token-red    { background-color: red; }
+#token-blue   { background-color: blue; }
+#token-yellow { background-color: yellow; }
+#token-green  { background-color: green; }
+
+/* =============================
+   RESPONSIVE
+============================= */
 @media (max-width: 600px) {
   .board {
-    width: 95vmin;                /* Usa vmin en lugar de vw para mantener proporciones */
+    width: 95vmin;
     height: 95vmin;
     min-width: 320px;
     min-height: 320px;
     padding: 2px;
-    gap: 1px;                     /* Reduce el espacio entre casillas */
+    gap: 1px;
   }
-  
-  .square {
-    font-size: 7px;               /* Texto un poco más pequeño */
-  }
-  
-  #center {
-    grid-row: 2 / 11;
-    grid-column: 2 / 11;
-    font-size: 12px;
-  }
-  
+  .square { font-size: 7px; }
+  #center { font-size: 12px; }
   .carta {
     width: 70px;
     height: 100px;
     font-size: 12px;
     margin: 5px;
-    border-radius: 10px;          /* Bordes menos redondeados */
+    border-radius: 10px;
   }
-  
   #logo {
     width: 120px;
     height: 60px;
     background-size: contain;
   }
+  .token {
+    width: 30px;
+    height: 30px;
+  }
 }
 
-/* Media query adicional para pantallas muy pequeñas */
 @media (max-width: 375px) {
   .board {
     width: 98vmin;
     height: 98vmin;
     gap: 1px;
   }
-  
-  .square {
-    font-size: 5px;               /* Texto aún más pequeño */
-  }
-  
+  .square { font-size: 5px; }
   .carta {
     width: 50px;
     height: 75px;
   }
-  
   #logo {
     width: 90px;
     height: 45px;
   }
-}
-
-/* Dejado exactamente igual como pediste */
-.token {
-  width: 50%;
-  height: 50%;
-  border-radius: 50%;
-  margin: auto;
-  border: 2px solid #333;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-}
-
-/* Colores de cada jugador */
-#token-red {
-  background-color: red;
-}
-#token-blue {
-  background-color: blue;
-}
-#token-yellow {
-  background-color: yellow;
-}
-#token-green {
-  background-color: green;
 }
