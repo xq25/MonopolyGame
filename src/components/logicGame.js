@@ -22,14 +22,19 @@ function isPropertyMortgaged(idProp, players){
   return ownerPlayer.mortgages.includes(String(idProp));
 }
 
+/**
+ * Esta funcion esta encargada de solicitar y buscar la informacion de una casilla especifica dentro de nuestro variable global boardData.
+ * @param {number} id - Este parametro hace referencia al id de la casilla solicitada 
+ * @returns 
+ */
 function getTileById(id){
   id = parseInt(id);
   return (boardData.bottom||[])
-    .concat(boardData.left||[], boardData.top||[], boardData.right||[])
-    .find(t => t.id === id);
+    .concat(boardData.left||[], boardData.top||[], boardData.right||[]) //Buscamos en todas las casillas almacenadas en los diferentes keys
+    .find(t => t.id === id); // Buscamos dentro de cada uno de esos keys si alguna de las casillas tiene dicho ID.
 }
 /**
- * Esta funcion es la que maneja toda la logica dentro de la partida. Cada uno de los eventos y sus respuestas dentro del tablero.
+ * Esta funcion es la que maneja toda la logica dentro de la partida. Cada uno de los eventos y sus respuestas dentro del tablero. Esta es la funcion que llamamos desde el index.js.
  * 
  * @param {Player[]} infoPlayers - Este parametro es el que almacena todos nuestros players y se actualiza a medida que pasa el juego.
  * @param {HTMLElement} tablero - Este es el elemento HTML del tablero. Lo usamos para hacer actualizaciones sobre el y acceder a las casillas.
@@ -43,44 +48,47 @@ export function playGame(infoPlayers, tablero){
   initCraps(); // Inicializamos los dados para realizar el primer turno
   if (popup) popup.style.display = "block";
 
-  // 🔹 Crear botón Finalizar juego si no existe aún (Depuracion)
+  // Buscamos el elemento boton endGame
   let endGameBtn = document.getElementById('endGameBtn');
 
   if (!endGameBtn) {
+    // Si no existe el elemento lo creamos (depuracion).
 
     endGameBtn = document.createElement('button');
     endGameBtn.id = 'endGameBtn';
     endGameBtn.textContent = 'Finalizar';
     endGameBtn.classList.add('btn-interface'); 
 
-    document.body.appendChild(endGameBtn);
+    document.body.appendChild(endGameBtn); // Lo agregamos al juego
 
     endGameBtn.addEventListener('click', () => { //Evento de finalizacion del juego.
 
-      // 🔹 Forzar actualización/validación de infoPlayers aquí para que no se carguen datos invalidos al score
+      // 💠 Forzar actualización/validación de infoPlayers aquí para que no se carguen datos invalidos al score
       const hasInvalid = infoPlayers.some(p => 
         p.money == null || !Array.isArray(p.properties) || !Array.isArray(p.mortgages)  //Validamos que todos los datos del score correspondan a la naturalidad necesaria para poder trabajar con ellos y sacar el score de cada jugador
       );
       if (hasInvalid) {
-        alert('Hay datos incompletos en infoPlayers');
+        alert('Hay datos incompletos en infoPlayers'); // Alerta en caso tal de que hayan datos NaN o Null. Impide calcular los scores.
         return;
       }
 
-      // 🔹 calculamos score con datos frescos y validos.
+      // 💠 calculamos score con datos frescos y validos.
       const scoreList = finalScores(infoPlayers);
 
-      // 🔹 Disparar evento
-      document.dispatchEvent(new CustomEvent('endGame', { detail: scoreList })); // Disparamos un evento personalizado para manejarlo todo desde el index.js
+      // 💠 Disparamos el evento enGame que sera escuchado desde el index.js. Esta es nuestra conexion de vuelta al index. Ya que despues de esto no hay mas logica del juego.
+      document.dispatchEvent(new CustomEvent('endGame', { detail: scoreList }/*mandamos los scores calculados la index.js*/)); // Disparamos un evento personalizado para manejarlo todo desde el index.js
     });
   }
 
-// Listener de eventos individuales de cada proceso de la interfaz del usuario. 
+//🟢 Listener de eventos individuales de cada proceso de la interfaz del usuario. 
 
+//  🔵 Evento Hipotecar una Propiedad!
   //Esto no depende directamente del turno del usuario. (Se puede hipotecar una propiedad siempre que el usuario necesite liquidez).
   document.addEventListener('mortgagepropertie', (e) => { //estamos a la escucha del evento si se hipoteca una casa para ejecutar la funcion de forma independiente. (Esto lo podemos hacer ya que la propia funcion refresca la interfaz del usuario)
     mortgagepropertie(e.detail[0],e.detail[1]);
   });
 
+//  🔵 Evento Des-Hipotecar una Propiedad!
   //Esto depende directamente del turno del usuario. (No se puede hipotecar una propiedad fuera del turno del usuario).
   document.addEventListener('unMortgagepropertie', (e) => {
 
@@ -135,6 +143,8 @@ export function playGame(infoPlayers, tablero){
 }
 
 /**
+ * Esta funcion es la encargada de todos las acciones de movimiento de jugador,--> excepto en ir a la carcel.
+ * La logica soporta movimientos arbitrarios muy grandes o negativos.
  * 
  * @param {number} numDados - Este parametro almacena el numero sacado en el turno del jugador por los dados. 
  * @param {object} infoPlayer - Este parametro almacena todo el objeto del player que esta realizando la funcion de moverse.
@@ -156,6 +166,7 @@ function changePositionPlayer(numDados, infoPlayer, tablero){
     alert(`¡${infoPlayer.getNickName()} pasa por la salida y recibe $${goBonus}!`);
   }
   else if (posPlayer < 0){
+    
     let turnsOnBoard = Math.floor(Math.abs(posPlayer) / 40) + 1; // +1 para cubrir negativos exactos
     posPlayer += turnsOnBoard * 40;
   }
@@ -177,14 +188,19 @@ function changePositionPlayer(numDados, infoPlayer, tablero){
   targetSquare.appendChild(tokenPlayer);
 }
 
+/**
+ * Esta funcion solo la utilizamoss al hacer el llamado a playGame, ya que solo se encarga de pintar a todos los jugadores en la primera casilla (square-0 o casilla de salida).
+ * @param {Player[]} playersList 
+ * @param {HTMLElement} tablero 
+ */
 function initializePositionPlayers(playersList, tablero){
   playersList.forEach(player => {
     changePositionPlayer(0, player, tablero)
   });
 }
 
-function eventBox(numDice, currentPlayer, allPlayers) {
-  const casilla = document.getElementById(`square-${numDice}`);
+function eventBox(posPlayer, currentPlayer, allPlayers) {
+  const casilla = document.getElementById(`square-${posPlayer}`);
   if (!casilla) return {};
   const tipo = casilla.getAttribute('data-type');
   let squareData = casilla.getAttribute('data-tile-info')
@@ -195,13 +211,13 @@ function eventBox(numDice, currentPlayer, allPlayers) {
     const price = squareData.price || parseInt(casilla.getAttribute('data-price')) || 0;
     const propertyName = squareData.name || casilla.querySelector('div:last-child')?.textContent || 'Propiedad';
     const propertyColor = squareData.color || casilla.getAttribute('data-color') || '';
-    const ownerNick = propertyOwners[numDice];
-    const mortgaged = ownerNick ? isPropertyMortgaged(numDice, allPlayers) : false;
+    const ownerNick = propertyOwners[posPlayer];
+    const mortgaged = ownerNick ? isPropertyMortgaged(posPlayer, allPlayers) : false;
 
     if (!ownerNick){
       return {
         actionType: 'buy-property',
-        propertyId: numDice,
+        propertyId: posPlayer,
         name: propertyName,
         price,
         color: propertyColor
@@ -209,21 +225,21 @@ function eventBox(numDice, currentPlayer, allPlayers) {
     } else if (mortgaged){
       return {
         actionType: 'mortgaged-property',
-        propertyId: numDice,
+        propertyId: posPlayer,
         name: propertyName,
         ownerId: ownerNick
       };
     } else if (ownerNick !== currentPlayer.getNickName()){
       return {
         actionType: 'pay-rent',
-        propertyId: numDice,
+        propertyId: posPlayer,
         name: propertyName,
         ownerId: ownerNick
       };
     } else {
       return {
         actionType: 'own-property',
-        propertyId: numDice,
+        propertyId: posPlayer,
         name: propertyName,
         canBuild: true
       };
@@ -260,7 +276,7 @@ function eventBox(numDice, currentPlayer, allPlayers) {
 
   // Especiales
   else if (tipo === 'special'){
-    switch(numDice){
+    switch(posPlayer){
       case '0': return { actionType: 'go', bonus: squareData.action?.money || 200 };
       case '10': return { actionType: 'jail-visit' };
       case '20': return { actionType: 'free-parking' };
@@ -275,7 +291,7 @@ function eventBox(numDice, currentPlayer, allPlayers) {
     if (squareData.action?.money){
       amount = Math.abs(squareData.action.money);
     } else {
-      switch(numDice){
+      switch(posPlayer){
         case '4': amount = 200; break;
         case '38': amount = 100; break;
         default: amount = 50;
@@ -288,20 +304,20 @@ function eventBox(numDice, currentPlayer, allPlayers) {
   else if (tipo === 'railroad'){
     const price = squareData.price || parseInt(casilla.getAttribute('data-price')) || 200;
     const railroadName = squareData.name || casilla.querySelector('div:last-child')?.textContent || 'Ferrocarril';
-    const ownerNick = propertyOwners[numDice];
-    const mortgaged = ownerNick ? isPropertyMortgaged(numDice, allPlayers) : false;
+    const ownerNick = propertyOwners[posPlayer];
+    const mortgaged = ownerNick ? isPropertyMortgaged(posPlayer, allPlayers) : false;
 
     if (!ownerNick){
       return {
         actionType: 'buy-railroad',
-        railroadId: numDice,
+        railroadId: posPlayer,
         name: railroadName,
         price
       };
     } else if (mortgaged){
       return {
         actionType: 'mortgaged-railroad',
-        railroadId: numDice,
+        railroadId: posPlayer,
         name: railroadName,
         ownerId: ownerNick
       };
@@ -314,20 +330,20 @@ function eventBox(numDice, currentPlayer, allPlayers) {
       const rentAmount = 25 * Math.pow(2, ownedRailroads - 1);
       return {
         actionType: 'pay-railroad-rent',
-        railroadId: numDice,
+        railroadId: posPlayer,
         name: railroadName,
         rent: rentAmount,
         ownerId: ownerNick
       };
     } else {
-      return { actionType: 'own-railroad', railroadId: numDice, name: railroadName };
+      return { actionType: 'own-railroad', railroadId: posPlayer, name: railroadName };
     }
   }
 
   return {};
 }
 /**
- * 
+ * Esta funcion la utilizamos para inicializar como instancias diccionarios, Asi agregando atributos pre-definidos y logrando trabajar con objetos.
  * @param {Object[]} playersList - Este parametro almacena la informacion de los formularios iniciales.
  * @returns - Nos retorna una lista de Objetos de la clase player con todos los atributos referenciados en el enunciado del proyecto (por defecto).
  */
@@ -341,6 +357,7 @@ export function initializePlayersClass(playersList){
 }
 
 /**
+ * 
  * 
  * @param {Player} objectPlayer - Este parametro almacena una instancia player con todos sus atributos para ser cargados (visualmente)
  * @returns 
