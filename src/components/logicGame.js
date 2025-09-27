@@ -13,13 +13,19 @@ export function setBoardData(data) {
   console.log("Datos del tablero cargados en logicGame.js");
 }
 
+/**
+ * 
+ * @param {number} idProp - Este id hacer referencia al ID de la casilla en la que esta el jugador, en este caso (una propiedad).
+ * @param {Player[]} players - Este parametro contiene los objetos de todos los jugadores, para asi validar de quien es la propiedad hipotecada.
+ * @returns 
+ */
 function isPropertyMortgaged(idProp, players){
-  const ownerNick = propertyOwners[idProp];
-  if (!ownerNick) return false;
-  const ownerPlayer = players.find(p => p.getNickName() === ownerNick);
+  const ownerNick = propertyOwners[idProp]; //Verificamos si la propiedad tiene dueño.
+  if (!ownerNick) return false; // Si no tiene dueño, por defecto no esta hipotecada.
+  const ownerPlayer = players.find(p => p.getNickName() === ownerNick); //Buscamos en nuestros player el que coincida su nickname con el nickname del jugador que tiene dicha propiedad hipotecada.
   if (!ownerPlayer) return false;
   if (!ownerPlayer.mortgages) ownerPlayer.mortgages = [];
-  return ownerPlayer.mortgages.includes(String(idProp));
+  return ownerPlayer.mortgages.includes(String(idProp)); //Agregamos este id a nuestra variable global.
 }
 
 /**
@@ -33,6 +39,7 @@ function getTileById(id){
     .concat(boardData.left||[], boardData.top||[], boardData.right||[]) //Buscamos en todas las casillas almacenadas en los diferentes keys
     .find(t => t.id === id); // Buscamos dentro de cada uno de esos keys si alguna de las casillas tiene dicho ID.
 }
+
 /**
  * Esta funcion es la que maneja toda la logica dentro de la partida. Cada uno de los eventos y sus respuestas dentro del tablero. Esta es la funcion que llamamos desde el index.js.
  * 
@@ -92,33 +99,42 @@ export function playGame(infoPlayers, tablero){
   //Esto depende directamente del turno del usuario. (No se puede hipotecar una propiedad fuera del turno del usuario).
   document.addEventListener('unMortgagepropertie', (e) => {
 
-    if (turnValidation(turn, infoPlayers, e.detail[1].color, maxTurn)){
+    if (turnValidation(turn, infoPlayers, e.detail[1].color, maxTurn)){ // Validamos que el color del player que ejecuta la accion sea correspodiente al turno asignado.
       unMortgagepropertie(e.detail[0], e.detail[1]);
     }
     else{
-      alert('No puedes Deshipotecar propiedades fuera de tu turno');
+      //En caso tal de que no sea asi, se le avisa al jugador con el alert.
+      alert('No puedes Deshipotecar propiedades fuera de tu turno'); 
       return;
     }
   });
 
+  //Evento de lanzamiento de dados (Base del Juego y manejo de turnos).
   document.addEventListener('diceRolled', (e) => {
-    const numDice = e.detail;
-    const currentPlayer = infoPlayers[turn];
+    //Cada vez que se lanza el dado se cambia el turno.
+
+    const numDice = e.detail; //Almacenamos el numero sacado por los dados (sea manual o random).
+    const currentPlayer = infoPlayers[turn]; //Sacamos la informacion del player correspondiente al turno.
 
     // Cárcel
-    if (currentPlayer.inJail) {
-      if (currentPlayer.getMoney() >= 50) {
+    if (!currentPlayer.active) {  //Si el jugador esta en la carcel(active = false), se activan los eventos para salir de la carcel. 
+      console.log(currentPlayer.active)
+      if (currentPlayer.getMoney() >= 50) { // Se valida que el usuario tenga dinero como para salir de la carcel.
         const pay = confirm(`${currentPlayer.getNickName()} está en la cárcel. ¿Pagar $50 para salir?`);
-        if (pay) {
+
+        if (pay) { // Pago para salir de la carcel.
+
           currentPlayer.setMoney(currentPlayer.getMoney() - 50);
-          currentPlayer.inJail = false;
+          currentPlayer.active = true;
           alert('Sales de la cárcel.');
-        } else {
+        } else { // No se pago para salir de la carcel.(Pero se tiene el dinero)
+
           alert('No pagas. Pierdes el turno en la cárcel.');
           turn = (turn === maxTurn-1) ? 0 : turn + 1;
           return;
         }
-      } else {
+      } else { // Si no se tiene el suficiente dinero se pierde el turno automaticamente.
+
         alert('No puedes pagar $50. Pierdes el turno en la cárcel.');
         turn = (turn === maxTurn-1) ? 0 : turn + 1;
         return;
@@ -127,12 +143,13 @@ export function playGame(infoPlayers, tablero){
 
     setTimeout(()=>{ if(popup) popup.style.display="none"; },1500);
 
-    if (currentPlayer.active){
-      changePositionPlayer(numDice, currentPlayer, tablero);
+    if (currentPlayer.active){ // Si el juegador no esta en la carcel (active = true), entonces manejamos los eventos del tuno comun y corriente. 
+
+      changePositionPlayer(numDice, currentPlayer, tablero); // Cambiamos primero la posicion del jugador segun el numero en los dados.
       setTimeout(() => {
-        const action = eventBox(currentPlayer.position.toString(), currentPlayer, infoPlayers);
-        processAction(action, infoPlayers, turn);
-        turn = (turn === maxTurn-1) ? 0 : turn + 1;
+        const action = eventBox(currentPlayer.position.toString(), currentPlayer, infoPlayers); // Almacenamos la accion a realizar, llegado al caso que lo haya.
+        processAction(action, infoPlayers, turn); // Procesamos y aplicamos los cambios correspondientes de dicha accion.
+        turn = (turn === maxTurn-1) ? 0 : turn + 1; // Avanzamos el turno sin salirnos del limite de jugadores.
       }, 100);
     } else {
       turn = (turn === maxTurn-1) ? 0 : turn + 1;
@@ -619,7 +636,7 @@ function processAction(action, infoPlayers, turn){
       const pj = infoPlayers[turn];
       alert("¡Vas a la cárcel!");
       pj.position = action.destination;
-      pj.inJail = true;
+      pj.active = false;
       const jailSquare = document.getElementById(`square-${action.destination}`);
       if (jailSquare){
         const oldToken = document.querySelector(`#token-${pj.color}`);

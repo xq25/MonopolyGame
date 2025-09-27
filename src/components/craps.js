@@ -52,8 +52,6 @@ function initCraps(
 
     const total = roll1 + roll2;
     if (manualCrap1.value.trim() === "" && manualCrap2.value.trim() === "") {
-      console.log(isManual1);
-      console.log(isManual2); 
       drawcrap(crap1, roll1);
       drawcrap(crap2, roll2);
     }

@@ -113,15 +113,15 @@ body {
   border: 2px solid #333;
   box-shadow: 0 2px 5px rgba(0,0,0,0.3);
   pointer-events: none;           /* No bloquea clics */
-  opacity: 0.8; /* 🔹 Un poquito transparente */
-  z-index: 90000;                 /* Por encima de todo */
+  opacity: 0.7; /* 🔹 Un poquito transparente */
+  z-index: 1000;                 /* Por encima de todo */
 }
 
 /* Colores de cada jugador */
-#token-red    { background-color: red; }
-#token-blue   { background-color: blue; }
-#token-yellow { background-color: yellow; }
-#token-green  { background-color: green; }
+#token-red    { background-color: red; box-shadow: red}
+#token-blue   { background-color: blue; box-shadow: blue;}
+#token-yellow { background-color: yellow; box-shadow: yellow;}
+#token-green  { background-color: green; box-shadow: green;}
 
 /* =============================
    RESPONSIVE
