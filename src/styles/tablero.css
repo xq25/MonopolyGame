@@ -116,7 +116,6 @@ body {
   opacity: 0.7; /* 🔹 Un poquito transparente */
   z-index: 1000;                 /* Por encima de todo */
 }
-
 /* Colores de cada jugador */
 #token-red    { background-color: red; box-shadow: red}
 #token-blue   { background-color: blue; box-shadow: blue;}

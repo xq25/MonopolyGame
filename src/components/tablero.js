@@ -36,7 +36,6 @@ window.updatePropertyState = function(propertyId, ownerColor) {
         hoteles = info.amountHotels ?? 0;
       } catch {}
     }
-
     // Muestra el texto SIEMPRE (aunque sean 0) solo para propiedades
     ownerBar.textContent = `🏠${casas} 🏨${hoteles}`;
   }
@@ -77,7 +76,7 @@ function makeSquare(tile) { //creamos las casillas
     ownerBar.style.height = "18px";
     ownerBar.style.backgroundColor = "transparent";
     ownerBar.style.textAlign = "center";
-    ownerBar.style.fontSize = "13px";
+    ownerBar.style.fontSize = "12px";
     ownerBar.style.fontWeight = "bold";
     ownerBar.style.lineHeight = "18px";
     ownerBar.style.color = "#fff";

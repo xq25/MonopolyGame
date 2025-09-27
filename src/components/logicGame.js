@@ -152,7 +152,23 @@ export function playGame(infoPlayers, tablero){
         turn = (turn === maxTurn-1) ? 0 : turn + 1; // Avanzamos el turno sin salirnos del limite de jugadores.
       }, 100);
     } else {
+
       turn = (turn === maxTurn-1) ? 0 : turn + 1;
+    }
+    if ((endGameBrokeCondition(infoPlayers))){
+      // 💠 Forzar actualización/validación de infoPlayers aquí para que no se carguen datos invalidos al score
+      const hasInvalid = infoPlayers.some(p => 
+        p.money == null || !Array.isArray(p.properties) || !Array.isArray(p.mortgages)  //Validamos que todos los datos del score correspondan a la naturalidad necesaria para poder trabajar con ellos y sacar el score de cada jugador
+      );
+      if (hasInvalid) {
+        alert('Hay datos incompletos en infoPlayers'); // Alerta en caso tal de que hayan datos NaN o Null. Impide calcular los scores.
+        return;
+      }
+
+      // 💠 calculamos score con datos frescos y validos.
+      const scoreList = finalScores(infoPlayers);
+
+      document.dispatchEvent(new CustomEvent('endGame', {detail: scoreList}))
     }
 
     setTimeout(()=>{ if(popup) popup.style.display="block"; },3000);
@@ -216,6 +232,13 @@ function initializePositionPlayers(playersList, tablero){
   });
 }
 
+/**
+ * Esta funcion nos permite obtener toda la informacion de las acciones que debemos hacer despues de caer en una casilla.
+ * @param {number} posPlayer - Este parametro Indica la posicion actual del jugador, que corresponde al ID de una casilla.
+ * @param {*} currentPlayer - Este parametro lo utilizamos para distintas validaciones dentro de la funcion.
+ * @param {*} allPlayers - Este parametro lo utilizamos para distintas validaciones dentro de la funcion.
+ * @returns 
+ */
 function eventBox(posPlayer, currentPlayer, allPlayers) {
   const casilla = document.getElementById(`square-${posPlayer}`);
   if (!casilla) return {};
@@ -359,6 +382,7 @@ function eventBox(posPlayer, currentPlayer, allPlayers) {
 
   return {};
 }
+
 /**
  * Esta funcion la utilizamos para inicializar como instancias diccionarios, Asi agregando atributos pre-definidos y logrando trabajar con objetos.
  * @param {Object[]} playersList - Este parametro almacena la informacion de los formularios iniciales.
@@ -374,8 +398,7 @@ export function initializePlayersClass(playersList){
 }
 
 /**
- * 
- * 
+ * Esta funcion es la encargada de cargar dinamicamente y estar actualizando la informacion de la interface del jugador a medida que trascurre el juegoo
  * @param {Player} objectPlayer - Este parametro almacena una instancia player con todos sus atributos para ser cargados (visualmente)
  * @returns 
  */
@@ -457,14 +480,20 @@ export function loadPlayerInterface(objectPlayer){
   });
 }
 
+/**
+ * Esta funcion nos permite validar si solo un jugador sigue teniendo suficiente liquidez como para seguir jugando.
+ * @param {Player[]} infoPlayers - Este parametro lo usamos para validar que players estan en bancaRota
+ * @returns {boolean}
+ */
 function endGameBrokeCondition(infoPlayers){
   const playersBroke = [];
-  let endGameCondition = false;
 
   infoPlayers.forEach(player => {
-      if (player.money <= 0 && player.properties.length === 0){
-        playersBroke.push(player);
-      }  
+    let notMortgagedPorpierties = player.properties.filter(item => !player.mortgages.includes(item)); // Verificamos que las propiedades que tenga no esten hipotecadas
+
+    if (player.money <= 0 && notMortgagedPorpierties.length === 0){ // SI el jugador se quedo sin dinero y sin propiedades sin hipotecar, se aagrega como un jugador en banca rota
+      playersBroke.push(player);
+    }  
   });
   return playersBroke.length === infoPlayers.length - 1;
 }
@@ -480,29 +509,40 @@ function getInfoElementHtml(idElement){
   return JSON.parse(el.getAttribute('data-tile-info')) || {};
 }
 
+/**
+ * Esta funcion es la encargada de manejar la logica de compra y venta de casas y hoteles de un jugador que posee dicha propiedad.
+ * @param {number} propertyId - Este parametro almacena el ID de propiedad, que hace referencia a la propiedad de un jugador que desea construir algo alli.
+ * @param {Player} player - Este parametro almacena a la instancia de Player que va a realizar un nueva construccion sobre su propiedad.
+ * @returns 
+ */
 function buildHouseOrHotel(propertyId, player){
-  const property = getTileById(propertyId);
-  if (!property){ alert("No se encontró la propiedad."); return; }
+  const property = getTileById(propertyId); // Sacamos toda la informacion de la casilla desde nuestra variable global.
+  if (!property){ alert("No se encontró la propiedad."); return; } // depuracion. 
 
   const sameColor = (boardData.bottom||[])
     .concat(boardData.left||[], boardData.top||[], boardData.right||[])
-    .filter(t => t.color === property.color);
+    .filter(t => t.color === property.color); //Verificamos cuantas propiedades del mismo color tiene el jugador.
     
-  const ownsAll = sameColor.every(t => propertyOwners[t.id] === player.getNickName());
-  if (!ownsAll){ alert("Debes poseer todo el grupo de color."); return; }
+  const ownsAll = sameColor.every(t => propertyOwners[t.id] === player.getNickName()); // Verificamos que las tenga todas.
 
-  if (!property.houses) property.houses = 0;
-  if (typeof property.amountHouses !== 'number') property.amountHouses = 0;
-  if (typeof property.amountHotels !== 'number') property.amountHotels = 0;
+  if (!ownsAll){ alert("Debes poseer todo el grupo de color."); return; } // Si no es asi le explicamos al usuario.
 
-  if (property.houses < 4 && !property.hotel){
+  if (!property.houses) property.houses = 0; // Si no existe el key de houses en nuestar variable global, lo creamos.
+  if (typeof property.amountHouses !== 'number') property.amountHouses = 0; // --> Evitamos errores por valores raros
+  if (typeof property.amountHotels !== 'number') property.amountHotels = 0; // --> Evitamos errores por valores raros
+
+  if (property.houses < 4 && !property.hotel){ //Si no se ha llegado al limite de casas y no se tienen hoteles.
+  //Construimos una nueva casa.
     property.houses++;
     property.amountHouses = property.houses;
     getInfoElementHtml(propertyId).amountHouses = property.houses;
     player.setMoney(player.getMoney() - 100);
     property.rent.base = property.rent.withHouse[property.houses - 1];
     alert(`Construyes casa en ${property.name}. Casas: ${property.houses}. Renta: $${property.rent.base}`);
-  } else if (!property.hotel){
+
+  } else if (!property.hotel){ // Si se llego al limites de casas y no hay hotel.
+
+    // Quitamos casas y construimos hotel.
     property.hotel = true;
     property.houses = 0;
     property.amountHouses = 0;
@@ -510,10 +550,12 @@ function buildHouseOrHotel(propertyId, player){
     player.setMoney(player.getMoney() - 250);
     property.rent.base = property.rent.withHotel;
     alert(`Construyes hotel en ${property.name}. Renta: $${property.rent.base}`);
+
   } else {
-    alert("Ya tienes hotel.");
+    // Si se tiene hotel.
+    alert("Ya tienes hotel."); //Le mostramos al usuario que llego a la construccion maxima dentro de su propiedad.
   }
-  // Actualizar atributo data-tile-info en el DOM
+  // Actualizar atributo data-tile-info en el DOM (variable global)
   const squareEl = document.getElementById(`square-${propertyId}`);
   if (squareEl){
     try {
@@ -529,11 +571,11 @@ function buildHouseOrHotel(propertyId, player){
   }
 
   window.updatePropertyState(propertyId, player.getColor());
-  loadPlayerInterface(player);
+  loadPlayerInterface(player); // <-- Recargamos la interface del usuario.
 }
 
 /**
- * 
+ * Esta funcion es la encargada de Hipotecar la propiedad de un player. (modifica sus atributos)
  * @param {number} idpropertieMortgage - Este parametro almecena la el id de la propiedad que deseamos hipotecar.
  * @param {Player} currentPlayer - Este parametro contiene todo el objeto del player que desea hipotecar una propiedad.
  */
@@ -549,7 +591,7 @@ function mortgagepropertie(idpropertieMortgage, currentPlayer){
 }
 
 /**
- * 
+ * Esta funcion es la encargada de Des-Hipotecar la propiedad de un player. (modifica sus atributos)
  * @param {number} idpropertieUnMortgage - Este parametro almecena la el id de la propiedad que deseamos des-hipotecar.
  * @param {Player} currentPlayer - Este parametro contiene todo el objeto del player que desea des-hipotecar una propiedad.
  */
@@ -558,12 +600,25 @@ function unMortgagepropertie(idpropertieUnMortgage, currentPlayer){
   
   if (deletedIndex !== -1){
     const mortgageInfo = getInfoElementHtml(idpropertieUnMortgage);
-    currentPlayer.mortgages.splice(deletedIndex,1);
-    currentPlayer.money -= (mortgageInfo.mortgage) * 1.1
-    loadPlayerInterface(currentPlayer);
+    if (currentPlayer.money >= ( mortgageInfo.mortgage * 1.1)){ //Si el jugador tiene el dinero para pagar el prestamo se desHipoteca, de lo contrario no.
+      currentPlayer.mortgages.splice(deletedIndex,1);
+      currentPlayer.money -= (mortgageInfo.mortgage) * 1.1 // Le restamos al jugador el valor de la hipoteca * el 1% de interes.
+      loadPlayerInterface(currentPlayer);
+    }
+    else{
+      alert('No posees el suficiente dinero para des-hipotecar esta propiedad'); // Informamos al usuario que no tiene el dinero suficiente
+    }
   }
 }
 
+/**
+ * Esta funcion se encaraga de analizar y clasificar las acciones despues de caer en una casilla.
+ * Esta funcion la usamos para modificar atributos de los jugadores sobre los cuales recae una accion despues de caer en una casilla.
+ * @param {object} action - Este parametro almacena como un objeto la accion y toda la informacion necesaria para modificar al player y los implicados en dicha accion.
+ * @param {Player[]} infoPlayers - Este parametro almacena a todos los jugadores para definir sobre cual recae la accion.
+ * @param {number} turn - Este parametro nos define sobre que jugador recae la accion.
+ * @returns 
+ */
 function processAction(action, infoPlayers, turn){
   if (!action || !Object.keys(action).length) return;
 
@@ -677,6 +732,14 @@ function processAction(action, infoPlayers, turn){
   loadPlayerInterface(infoPlayers[turn]);
 }
 
+/**
+ * Esta funcion se encarga de validar que el jugador corresponda a un turno en especifico.
+ * @param {number} turn - Este parametro almacena el turno actual en el juego.
+ * @param {Player[]} infoPlayers  - Este parametro almacena la lista de objetos Player con todos sus atributos.
+ * @param {string} colorPlayerTurn - Este parametro almacena el color del jugador actual. Sobre el cual se quiere hacer la validacion.
+ * @param {number} maxTurn - Este parametro almacena el turno maximo en relacion con la cantidad de jugadores, para evitar fallos.
+ * @returns {boolean}
+ */
 function turnValidation (turn, infoPlayers, colorPlayerTurn, maxTurn){
   if (turn === maxTurn-1){
     turn = 0;
@@ -691,36 +754,39 @@ function turnValidation (turn, infoPlayers, colorPlayerTurn, maxTurn){
 }
 
 /**
- * 
+ * Esta funcion es la encargada de usar la logia del enunciado del proyecto para calcular todos los scores de todos los jugadores.
  * @param {Player[]} playersList - Este parametro almacena la lista de instancias player para poder sacar sus atributos y asi utilizarlos en el calculo del score.
- * @returns {object[]}
+ * @returns {object[]} - Lista de los scores de todos los jugadores.
  */
 function finalScores(playersList){
   let scoresList = [];
   playersList.forEach(player => {
     // Asegura money como número
-    let scorePlayer = Number(player.money) || 0;
+    let scorePlayer = Number(player.money) || 0; // Le sumamos primeramente el dinero que posee el player como score
 
     let propertiesPlayer = player.properties || [];
     let mortgagesPlayer = player.mortgages || [];
 
     propertiesPlayer.forEach(prop => {
       if (!mortgagesPlayer.includes(prop)){
-        const infoProp = getInfoElementHtml(prop) || {};
+        const infoProp = getInfoElementHtml(prop) || {}; // Extraemos la informacion de la propiedad.
+
+        //Separamos las caracteristicas de la propiedad a tener el cuenta para sumar al score.
         let price = Number(infoProp.price) || 0;
         let houses = Number(infoProp.amountHouses) || 0;
+        let hotels = Number(infoProp.amountHotels) || 0;
 
-        let propertieScore = price + (houses * 100) + (houses * 200);
-        scorePlayer += propertieScore;
+        let propertieScore = price + (houses * 100) + (hotels * 200); //Sacamos el score general de cada propiedad.
+        scorePlayer += propertieScore; // Sumamos el score de propiedad al score general.
       }
     });
-
+    // Generamos este formato para cada player.
     scoresList.push({
       'nick_name': player.nick_name,
       'score': isNaN(scorePlayer) ? 0 : scorePlayer, // fallback
       'country_code': player.country
     });
   });
-  return scoresList;
+  return scoresList; //Retornamos la lista de los scores finales
 }
 
