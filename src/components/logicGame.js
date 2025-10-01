@@ -147,6 +147,9 @@ export function playGame(infoPlayers, tablero){
 
       changePositionPlayer(numDice, currentPlayer, tablero); // Cambiamos primero la posicion del jugador segun el numero en los dados.
       setTimeout(() => {
+
+        //Por cada tirada del jugador actualizamos su frecuencia. (Unicamente para los jugadores activos)
+        actualizarFrecuencia(infoPlayers[turn],infoPlayers[turn].position);
         const action = eventBox(currentPlayer.position.toString(), currentPlayer, infoPlayers); // Almacenamos la accion a realizar, llegado al caso que lo haya.
         processAction(action, infoPlayers, turn); // Procesamos y aplicamos los cambios correspondientes de dicha accion.
         turn = (turn === maxTurn-1) ? 0 : turn + 1; // Avanzamos el turno sin salirnos del limite de jugadores.
@@ -406,7 +409,7 @@ export function loadPlayerInterface(objectPlayer){
   if (!objectPlayer) return;
   const gameDiv = document.getElementById('gameDiv');
   let divInfoPlayer = document.getElementById(`player-${objectPlayer.color}`);
-
+  const frecuencia = window.frecuencias[`${objectPlayer.nick_name}`]
   // Construimos las options del select a partir de objectPlayer.properties
   const optionsproperties =
     objectPlayer.properties && objectPlayer.properties.length > 0
@@ -447,6 +450,45 @@ export function loadPlayerInterface(objectPlayer){
       </select>
       <button class="btn-interface" id="unMortgage-${objectPlayer.color}">DesHipotecar</button>
     </div>
+    <div class="mas-frecuente">
+      Color más frecuente: <span id="color-mas-frecuente">${masFrecuente(frecuencia)}</span>
+    </div>
+
+    <div class="table-frecuencia" role="table" aria-label="Tabla de ejemplo">
+      <div class="celd brown" role="cell">
+        <div class="contador contador-brown">${frecuencia.brown}</div>
+        <div class="textCeld">Brown</div>
+      </div>
+      <div class="celd purple" role="cell">
+        <div class="contador contador-purple">${frecuencia.purple}</div>
+        <div class="textCeld">Purple</div>
+      </div>
+      <div class="celd pink" role="cell">
+        <div class="contador contador-pink">${frecuencia.pink}</div>
+        <div class="textCeld">Pink</div>
+      </div>
+      <div class="celd orange" role="cell">
+        <div class="contador contador-orange">${frecuencia.orange}</div>
+        <div class="textCeld">Orange</div>
+      </div>
+
+      <div class="celd red" role="cell">
+        <div class="contador contador-red">${frecuencia.red}</div>
+        <div class="textCeld">Red</div>
+      </div>
+      <div class="celd yellow" role="cell">
+        <div class="contador contador-yellow">${frecuencia.yellow}</div>
+        <div class="textCeld">Yellow</div>
+      </div>
+      <div class="celd green" role="cell">
+        <div class="contador contador-green">${frecuencia.green}</div>
+        <div class="textCeld">Green</div>
+      </div>
+      <div class="celd blue" role="cell">
+        <div class="contador contador-blue">${frecuencia.blue}</div>
+        <div class="textCeld">Blue</div>
+      </div>
+</div>
   `;
 
   const header = divInfoPlayer.querySelector('.player-header');
@@ -788,5 +830,39 @@ function finalScores(playersList){
     });
   });
   return scoresList; //Retornamos la lista de los scores finales
+}
+
+function actualizarFrecuencia(currentPlayer, idCasilla) {
+  const colorCasilla = getInfoElementHtml(idCasilla).color;
+
+  // Seguridad: aseguramos que exista la estructura
+  if (!window.frecuencias) {
+    window.frecuencias = {};
+  }
+  if (!window.frecuencias[currentPlayer.nick_name]) { //Si no existe las frecuencias del jugador las creamos por defecto
+    window.frecuencias[currentPlayer.nick_name] = {
+      brown: 0, purple: 0, pink: 0, orange: 0,
+      red: 0, yellow: 0, green: 0, blue: 0
+    };
+  }
+
+  if (window.frecuencias[currentPlayer.nick_name][colorCasilla] !== undefined) {  //Verificamos que el color de la casilla que rescatamoss de la informacion este dentro de las posibilidades en el panel
+    window.frecuencias[currentPlayer.nick_name][colorCasilla]++; // Si esta en el panel le sumamos uno a su valor
+  }
+}
+function masFrecuente(frecuenciasPlayer){
+  // Obtenemos las claves y buscamos la de mayor valor
+  let maxKey = null;
+  let maxValue = 0;
+
+  Object.entries(frecuenciasPlayer).forEach(([color, value]) => {
+    if (value > maxValue) {
+      maxValue = value;
+      maxKey = color;
+    }
+  });
+
+  return maxKey!== null?maxKey:'N/A'; // Devuelve el color con mayor frecuencia si existe alguno, si todos son 0 
+
 }
 

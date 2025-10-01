@@ -251,6 +251,63 @@
   transform: scale(0.98);
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
 }
+.table-frecuencia {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 columnas iguales */
+  gap: 8px;                              /* separación entre recuadros */
+  width: 100%;
+  margin-top: 10px;
+}
+
+.celd {
+  aspect-ratio: 1 / 1;                  /* cuadrados proporcionales */
+  background-color: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;                      /* centrado del contenido */
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+
+.textCeld {
+  margin-top: 70%;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #fff;
+  text-align: center;
+}
+.contador{
+  height: 10px;
+  margin-left: 49%;
+  margin-right: 49%;
+  text-align: center;
+  font-weight: bold;
+}
+.mas-frecuente {
+  background-color: rgba(255, 255, 255, 0.15);
+  border: 2px solid gold;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 10px;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #fff;
+}
+
+
+/* Colores */
+.brown { background-color: brown; }
+.purple { background-color: purple; }
+.pink { background-color: pink; }
+.orange { background-color: orange; }
+.red { background-color: red; }
+.yellow { background-color: yellow; }
+.green { background-color: green; }
+.blue { background-color: blue; }
+
+
+
 
 @media(min-width: 992px){
   .playerInterface{

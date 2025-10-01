@@ -11,6 +11,7 @@ const rulesButton = document.getElementById("rulesButton"); // boton rules del H
 const playButton = document.getElementById("playButton"); // boton play del Home
 const content = document.getElementById("content"); // el div donde se quiere cargar el contenido
 const rankButton = document.getElementById("rankButton"); // boton rank del Home
+window.frecuencias = {}
 
 // Cargar el contenido inicial (por defecto cargamos la introduccion del juego)
 function initializeHomePage() {
@@ -84,6 +85,8 @@ document.addEventListener("DOMContentLoaded", () => {
             const objectList = initializePlayersClass(infoPlayers);
             
             objectList.forEach(player => {
+                //Inicializacion de la variable global en referencia de todos los usuarios 
+                window.frecuencias[`${player.nick_name}`] = {'brown': 0, 'purple':0, 'pink':0, 'orange': 0 ,'red': 0,'yellow': 0, 'green': 0, 'blue': 0 };
                 loadPlayerInterface(player);
             });
             playGame(objectList, tablero);
